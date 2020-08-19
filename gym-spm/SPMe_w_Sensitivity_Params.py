@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from math import asinh, tanh, cosh
 from SPMe_Baseline_Params import SPMe_Baseline_Parameters
+
 import csv
 
 
@@ -354,17 +355,14 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
                 -3 * Jp / (2 * self.param['as_p'] ** 2 * j0_p * self.param['Rp']))
 
         rho2p = (self.param['R'] * self.param['T']) / (2 * 0.5 * self.param['F']) * (self.param['cep'] * self.param['cs_max_p'] - 2 * self.param['cep'] * theta_p) / (
-                    self.param['cep'] * theta_p * (self.param['cs_max_p'] - theta_p)) * (1 + (1 / (k_p) ** 2)) ** (-0.5)
+                    self.param['cep'] * theta_p * (self.param['cs_max_p'] - theta_p)) * (1 + (1 / (k_p + .00000001) ** 2)) ** (-0.5)
 
-
-        # print(rho1p, "|", rho2p )
-        # print(theta_p)
         # rho1n_1 = np.sign(I) * (-3 * R * T) / (0.5 * F * Rn * as_n) * ((1 + 1 / k_n ** 2) ** (-0.5))
         rho1n = self.param['R'] * self.param['T'] / (0.5 * self.param['F']) * (1 / (k_n + (k_n ** 2 + 1) ** 0.5)) * (1 + k_n / ((k_n ** 2 + 1) ** 0.5)) * (
                 -3 * Jn / (2 * self.param['as_n'] ** 2 * j0_n * self.param['Rn']))
 
         rho2n = (-self.param['R'] * self.param['T']) / (2 * 0.5 * self.param['F']) * (self.param['cen'] * self.param['cs_max_n'] - 2 * self.param['cen'] * theta_n) / (
-                    self.param['cen'] * theta_n * (self.param['cs_max_n'] - theta_n)) * (1 + 1 / (k_n) ** 2) ** (-0.5)
+                    self.param['cen'] * theta_n * (self.param['cs_max_n'] - theta_n)) * (1 + 1 / (k_n + .00000001) ** 2) ** (-0.5)
 
         # sensitivity of epsilon_sp epsilon_sn
         sen_out_spsi_p = (rho1p + (rho2p + docvp_dCsep)*-out_Sepsi_p)
@@ -528,6 +526,9 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
         if full_sim is True:
             I = I_input
             soc = state_of_charge
+
+            if I == 0:
+                I = .000000001
         else:
             # Initialize Input Current
             if I_input is None:
@@ -545,7 +546,7 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
         if states is None:
             stoi_n, stoi_p = self.compute_Stoich_coef(soc)
 
-            # IF not initial state is supplied to the "step" method, treat step as initial step
+            # IF no initial state is supplied to the "step" method, treat step as initial step
             xn_old = np.array([[(stoi_n * cs_max_n) / (rfa_n * 10395 * (Ds_n ** 2))], [0], [0]])  # stoi_n100 should be changed if the initial soc is not equal to 50 %
             xp_old = np.array([[(stoi_p * cs_max_p) / (rfa_p * 10395 * (Ds_p ** 2))], [0], [0]])  # initial positive electrode ion concentration
             xe_old = np.array([[0], [0]])
@@ -557,6 +558,8 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
 
             bat_states = {"xn": xn_old, "xp": xp_old, "xe": xe_old}
             outputs = {"yn": None, "yp": None, "yep": None}
+
+            init_bat_states = bat_states
 
             sensitivity_states = {"Sepsi_p": Sepsi_p_old, "Sepsi_n": Sepsi_n_old, "Sdsp_p": Sdsp_p_old, "Sdsn_n": Sdsn_n_old}
             sensitivity_outputs = {"dV_dDsn": None, "dV_dDsp": None, "dCse_dDsn": None, "dCse_dDsp": None, "dV_dEpsi_sn": None, "dV_dEpsi_sp": None}
@@ -576,6 +579,10 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
         # Molar Current Flux Density (Assumed UNIFORM for SPM)
         Jn = I / Vn
         Jp = -I / Vp
+
+        if Jn == 0:
+            print("Molar Current Density (Jn) is equal to zero. This causes 'division by zero' later")
+            print("I", I)
 
         # Compute "current timestep" Concentration from "Battery States" via Output Eqn (Pos & Neg)
         yn_new = C_dn @ xn_old + D_dn * 0
@@ -599,8 +606,9 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
         phi_p = phi_n + vel
 
         # Compute "Exchange Current Density" per Electrode (Pos & Neg)
-        i_0n = kn * F * (cen * yn_new * (cs_max_n - yn_new)) ** .5
-        i_0p = kp * F * (cep * yp_new * (cs_max_p - yp_new)) ** .5
+        i_0n = kn * F * (abs(cen * yn_new * (cs_max_n - yn_new))) ** .5
+        i_0p = kp * F * (abs(cep * yp_new * (cs_max_p - yp_new))) ** .5
+
 
         # Kappa (pos & Neg)
         k_n = Jn / (2 * as_n * i_0n)
@@ -633,10 +641,54 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
         V_term = (U_p - U_n) + (eta_p - eta_n) + vel - Rf * I / (Ar_n * Ln * as_n)  # terminal voltage
         R_film = -Rf * I / (Ar_n * Ln * as_n)
 
-        if V_term <= 2.75 and self.limit_term_volt is True: # or V_term >= 4.2:
+        if np.isnan(V_term):
+            print(" ######################      SURE     IS      ##################")
+            print("yn_new", yn_new)
+            print("yp_new", yp_new)
+            print("i_0n", i_0n)
+            print("i_0p", i_0p)
+            print("k_n", k_n)
+            print("k_p", k_p)
+            print("eta_p", eta_p)
+            print("eta_n", eta_n)
+            print("SOC", theta[0])
+            print("U_p", U_p)
+            print("U_n", U_n)
+
+            print(" --------- Expressions ------------- ")
+            print("(cs_max_n - yn_new)", (cs_max_n - yn_new))
+            print("(cs_max_p - yp_new)", (cs_max_p - yp_new))
+            print("cs_max_n",cs_max_n)
+            print("cs_max_p", cs_max_p)
+
+
+            expr = (cen * yn_new * (cs_max_n - yn_new)) ** .5
+
+            expr1 = (cs_max_n - yn_new)
+            expr2 = abs(cen * yn_new * (cs_max_n - yn_new))
+
+            print(f'kn {kn} F {F} cen {cen} yn_new {yn_new} cs_max_n {cs_max_n}, expression {expr} ')
+            print(f'Expression 1 {expr1}')
+            print(f'Expression 2 {expr2}')
+            print(f'Expression 3 {expr2**.5}')
+
+            print(yn_new)
+            print(yp_new)
+
+            print("#################################################################################")
+
+
+
+
+
+            # return [init_bat_states, sensitivity_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse]
+
+
+        if V_term <= 2.75 and self.limit_term_volt is True:
             return [init_bat_states, sensitivity_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse]
         else:
             return [bat_states, new_sen_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse]
+
 
 if __name__ == "__main__":
 
