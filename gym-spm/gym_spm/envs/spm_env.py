@@ -9,7 +9,7 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
 
     metadata = {'render.modes': ['human']}
 
-    def __init__(self, time_step=1, SOC=1):
+    def __init__(self, time_step=1, SOC=.5):
         super(SingleParticleModelElectrolyte_w_Sensitivity).__init__()
 
         self.time_step = time_step
@@ -18,7 +18,6 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         # state_limits = np.array([np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf], dtype=np.float32)
         state_limits = np.array([np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf], dtype=np.float32)
 
-
         max_C_val = np.array([25.67*3], dtype=np.float32)
 
         self.SOC_0 = SOC
@@ -26,7 +25,7 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         self.epsi_sp = None
         self.term_volt = None
 
-        self.min_soc = -.00000001
+        self.min_soc = -.0000000001
         self.max_soc = 1.0000001
         self.min_voltage = 2.74
         self.max_voltage = 4.1
@@ -40,6 +39,7 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         self.sim_state = None
         self.steps_beyond_done = None
         self.np_random = None
+        self.state_output = None
 
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -74,20 +74,27 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         [bat_states, new_sen_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse] = self.SPMe.step(full_sim=True, states=self.sim_state, I_input=action, state_of_charge=self.state_of_charge)
 
         self.sim_state = [bat_states, new_sen_states]
-
+        self.state_output = outputs
         self.state = (self.unpack_states(bat_states, new_sen_states))
         self.epsi_sp = sensitivity_outputs['dV_dEpsi_sp']
+        self.term_volt = V_term
 
-        self.state_of_charge = soc_new[0]
+        self.state_of_charge = soc_new[1]
         # self.state = [bat_states, new_sen_states]
 
         done = bool(self.state_of_charge < self.min_soc
                     or self.state_of_charge > self.max_soc
-                    or V_term < self.min_voltage
-                    or V_term > self.max_voltage)
+                    or np.isnan(V_term))
+
+        if done is True:
+            print("SOC",self.state_of_charge)
+            print('Term Voltage', V_term)
+                    # or V_term < self.min_voltage
+                    # or V_term > self.max_voltage)
 
         if not done:
             reward = self.reward_function(self.epsi_sp)
+
         elif self.steps_beyond_done is None:
             # Pole just fell!
             self.steps_beyond_done = 0

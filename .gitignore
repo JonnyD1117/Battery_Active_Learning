@@ -1,3 +1,4 @@
 *.zip
 */PPO_spm_v0_tensorboard/*
 */TD3_spm_v0_tensorboard/*
+*/TD3_spm_v1_SOC_point5/*

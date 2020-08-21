@@ -95,31 +95,6 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
         self.Ce_dp = self.Cep
         self.De_dp = self.Dep
 
-        # print(self.A_dp)
-        # print("-----------------------------------------------------------")
-        # print(self.B_dp)
-        # print("-----------------------------------------------------------")
-        # print(self.C_dp)
-        # print("-----------------------------------------------------------")
-        # print(self.D_dp)
-
-        # print(self.A_dn)
-        # print("-----------------------------------------------------------")
-        # print(self.B_dn)
-        # print("-----------------------------------------------------------")
-        # print(self.C_dn)
-        # print("-----------------------------------------------------------")
-        # print(self.D_dn)
-
-        print(self.Ae_dp)
-        print("-----------------------------------------------------------")
-        print(self.Be_dp)
-        print("-----------------------------------------------------------")
-        print(self.Ce_dp)
-        print("-----------------------------------------------------------")
-        print(self.De_dp)
-
-
         # Sensitivities
         # sensitivity realization in time domain for epsilon_sp from third order pade(you can refer to my slides)
         coefp = 3 / (self.param['F'] * self.param['Rp'] ** 6 * self.param['as_p'] ** 2 * self.param['Ar_p'] * self.param['Lp'])
@@ -562,8 +537,6 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
 
         # Initialize "State" Vector
         if states is None:
-            print(" ######################################### STATES ARE NONE #####################################")
-            print("################################################################################################")
             stoi_n, stoi_p = self.compute_Stoich_coef(soc)
 
             # IF no initial state is supplied to the "step" method, treat step as initial step
@@ -585,8 +558,6 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
             sensitivity_outputs = {"dV_dDsn": None, "dV_dDsp": None, "dCse_dDsn": None, "dCse_dDsp": None, "dV_dEpsi_sn": None, "dV_dEpsi_sp": None}
 
         else:
-            print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ STATE ARE NOT NONE $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-            print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
             bat_states = states[0]
             init_bat_states = bat_states
             init_sen_states = states[1]
@@ -622,13 +593,10 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
 
         # Electrolyte Dynamics
         vel = (-I * (0.5 * Lp + 0.5 * Ln) / (Ar_n * kappa_eff) + (-I * Lsep) / (Ar_n * kappa_eff_sep) + (2 * R * T * (1 - t_plus) * (1 + 1.2383) * np.log((1000 + yep_new[0].item()) / (1000 + yep_new[1].item()))) / F)  # yep(1, k) = positive boundary;
-
-        if np.isnan(vel):
-            print("_________________________________________________________________________________VEL IS NAN, =", vel)
-        # R_e = -I * (0.5 * Lp + 0.5 * Ln) / (Ar_n * kappa_eff) + (-I * Lsep) / (Ar_n * kappa_eff_sep)
-        # V_con = (2 * R * T * (1 - t_plus) * (1 + 1.2383) * np.log((1000 + yep_new[0].item()) / (1000 + yep_new[1].item()))) / F
-        # phi_n = 0
-        # phi_p = phi_n + vel
+        R_e = -I * (0.5 * Lp + 0.5 * Ln) / (Ar_n * kappa_eff) + (-I * Lsep) / (Ar_n * kappa_eff_sep)
+        V_con = (2 * R * T * (1 - t_plus) * (1 + 1.2383) * np.log((1000 + yep_new[0].item()) / (1000 + yep_new[1].item()))) / F
+        phi_n = 0
+        phi_p = phi_n + vel
 
         # Compute "Exchange Current Density" per Electrode (Pos & Neg)
         i_0n = kn * F * ((cen * yn_new * (cs_max_n - yn_new))) ** .5
@@ -679,7 +647,6 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
             print("INPUT CURRENT", I)
             print("yn_new", yn_new)
             print("yp_new", yp_new)
-            print("YEP", yep_new)
             print("i_0n", i_0n)
             print("i_0p", i_0p)
             print("k_n", k_n)
@@ -710,31 +677,31 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
 
 
             print("#################################################################################")
-            print("Vel",vel)
 
 
 
 
 
-        return [bat_states, new_sen_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse]
 
 
-        # # # if V_term <= 2.75 and self.limit_term_volt is True:
-        # # if yn_new < 0 or yp_new < 0:
-        # if soc_new[1] < .1 or soc_new[1] < .1 or soc_new[0] < .1 or soc_new[0] < .1 or soc_new[1] < .98 or soc_new[1] < .98 or soc_new[0] < .98 or soc_new[0] < .98 or np.isnan(V_term) is True :
+        # # if V_term <= 2.75 and self.limit_term_volt is True:
+        if yn_new < 0 or yp_new < 0:
         #
-        #     return [init_bat_states, sensitivity_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse]
-        # else:
-        #     return [bat_states, new_sen_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse]
+        #     print('WHAT THE FUCK, HOW THE FUCK, HOW DID YOU TWO FUCKING FUCKS FUCKING FUCK!!!!!!!!!!')
+        #     print(soc_new)
+        #
+            return [init_bat_states, sensitivity_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse]
+        else:
+            return [bat_states, new_sen_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse]
 
 
 if __name__ == "__main__":
 
-    SPMe = SingleParticleModelElectrolyte_w_Sensitivity(sim_time=1300,)
+    SPMe = SingleParticleModelElectrolyte_w_Sensitivity(sim_time=1300, )
 
-    # [xn, xp, xe, yn, yp, yep, theta_n, theta_p, docv_dCse_n, docv_dCse_p, V_term,
-    #  time, current, soc, dV_dDsn, dV_dDsp, dCse_dDsn, dCse_dDsp, dV_dEpsi_sn, dV_dEpsi_sp]\
-    #     = SPMe.sim(CC=True, zero_init_I=True, I_input=[-25.67*3], init_SOC=0, plot_results=True)
+    [xn, xp, xe, yn, yp, yep, theta_n, theta_p, docv_dCse_n, docv_dCse_p, V_term,
+     time, current, soc, dV_dDsn, dV_dDsp, dCse_dDsn, dCse_dDsp, dV_dEpsi_sn, dV_dEpsi_sp]\
+        = SPMe.sim(CC=True, zero_init_I=True, I_input=[-25.67*3], init_SOC=0, plot_results=True)
 
 
 

@@ -32,7 +32,6 @@ for t in range(0, len(time)-1):
     epsi_sp_list.append(custom_gym.epsi_sp.item(0))
     reward_list.append(reward.item())
 
-
 plt.figure()
 plt.plot(I_list)
 plt.title("INPUT CURRENT")

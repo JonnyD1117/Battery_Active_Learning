@@ -25,7 +25,7 @@ class SPMe_Baseline_Parameters:
     Lc = Ln + Lp + Lsep  # Total Cell Thickness
 
     Ds_n = 3.9e-14  # Solid phase diffusion coefficient (pos & neg)
-    Ds_p = (1e-13) * .5
+    Ds_p = 1e-13
     De = 2.7877e-10  # Electrolyte Diffusion Coefficient
     De_p = De
     De_n = De

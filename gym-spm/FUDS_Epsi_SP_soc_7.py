@@ -18,7 +18,6 @@ mat = scipy.io.loadmat("I_FUDS.mat")
 I_fuds = mat["I"][0][:]
 time = mat['time'][0][:]
 
-
 for i in range(len(I_fuds)):
     if np.isnan(I_fuds[i]):
         print("NAN Failed : ", i)
@@ -37,6 +36,10 @@ for t in range(0, len(time)):
     SOC_list.append(custom_gym.state_of_charge[0].item())
     epsi_sp_list.append(custom_gym.epsi_sp.item(0))
     reward_list.append(reward.item())
+
+
+
+
 
 plt.figure()
 plt.xlabel('Time [seconds]')

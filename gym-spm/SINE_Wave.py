@@ -11,12 +11,13 @@ custom_gym.__init__(time_step=.2, SOC=.7)       # Re-initialize to recompute wit
 SOC_list = []
 epsi_sp_list = []
 reward_list = []
+v_term = [] 
 
 time = np.arange(0, 2000.2, .2)
-I_sine = [100*np.sin(.001*t) for t in range(len(time))]
+I_sine = [130*np.sin(.001*t) for t in range(len(time))]
 
 plt.plot(I_sine)
-plt.show()
+# plt.show()
 
 # Iterate over Custom Battery Environment for duration of I_FUDS profile
 for t in range(0, len(time)-1):
@@ -26,11 +27,20 @@ for t in range(0, len(time)-1):
 
     # STEP func.
     if done:
+        pass
+        print("BREAK OCCURED")
         break
 
+
+    v_term.append(custom_gym.term_volt[0].item())
     SOC_list.append(custom_gym.state_of_charge[0].item())
     epsi_sp_list.append(custom_gym.epsi_sp.item(0))
     reward_list.append(reward.item())
+
+
+plt.figure()
+plt.plot(v_term)
+# plt.show()
 
 plt.figure()
 plt.xlabel('Time [seconds]')

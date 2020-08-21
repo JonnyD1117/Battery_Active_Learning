@@ -19,8 +19,14 @@ epsi_sp_list_3C = []
 # time = 3600//2
 # I = 25.67*2
 
+e_state = []
+e_output = []
+
 I_list = [25.67*1, 25.67*2, 25.67*3]
 time_list = [3600, 1800, 1200]
+
+I_list = [25.67*1]
+
 
 
 for ind in range(len(I_list)):
@@ -34,8 +40,9 @@ for ind in range(len(I_list)):
         # Use OpenAI GYM "STEP" func. to propagate inputs through battery model
         states, reward, done, info = custom_gym.step(I)
 
-        # STEP func.
+        e_state.append(states[6])
 
+        # STEP func.
         if done:
             break
 
@@ -53,6 +60,11 @@ for ind in range(len(I_list)):
     custom_gym.reset()
     # break
 
+
+plt.figure()
+plt.plot(e_state)
+plt.show()
+print(SOC_list_1C)
 plt.figure()
 plt.xlabel('Time [seconds]')
 plt.ylabel('State of Charge (SOC)')
