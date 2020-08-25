@@ -14,7 +14,7 @@ reward_list = []
 v_term = [] 
 
 time = np.arange(0, 2000.2, .2)
-I_sine = [130*np.sin(.001*t) for t in range(len(time))]
+I_sine = [100*np.sin(.001*t) for t in range(len(time))]
 
 plt.plot(I_sine)
 # plt.show()

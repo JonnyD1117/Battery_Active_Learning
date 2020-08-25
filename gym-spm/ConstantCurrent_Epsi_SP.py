@@ -25,8 +25,8 @@ e_output = []
 I_list = [25.67*1, 25.67*2, 25.67*3]
 time_list = [3600, 1800, 1200]
 
-I_list = [25.67*1]
-
+# I_list = [25.67*1]
+I_list = [25.67*3]
 
 
 for ind in range(len(I_list)):
@@ -40,10 +40,11 @@ for ind in range(len(I_list)):
         # Use OpenAI GYM "STEP" func. to propagate inputs through battery model
         states, reward, done, info = custom_gym.step(I)
 
-        e_state.append(states[6])
+        e_state.append(states[1].item())
 
         # STEP func.
         if done:
+            print("CC Sim Acknowledges DONE = TRUE, :. Break")
             break
 
         if ind == 0:

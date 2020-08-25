@@ -25,8 +25,8 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         self.epsi_sp = None
         self.term_volt = None
 
-        self.min_soc = -.0000000001
-        self.max_soc = 1.0000001
+        self.min_soc = .04
+        self.max_soc = 1.
         self.min_voltage = 2.74
         self.max_voltage = 4.1
 
@@ -45,7 +45,7 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
-    def unpack_states(self, bat_states, sen_states):
+    def unpack_states(self, bat_states, sen_states, state_out, sen_out):
 
         x1 = bat_states['xn']
         x2 = bat_states['xp']
@@ -56,10 +56,21 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         x6 = sen_states['Sdsp_p']
         x7 = sen_states['Sdsn_n']
 
-        # return [x1[0], x1[1], x1[2], x2[0], x2[1], x2[2], x3[0], x3[1], x4[0], x4[1], x4[2], x5[0], x5[1], x5[2], x6[0], x6[1], x6[2], x6[3], x7[0], x7[1], x7[2], x7[3]]
-        return [x1[0][0], x1[1][0], x1[2][0], x2[0][0], x2[1][0], x2[2][0], x3[0][0], x3[1][0], x4[0][0], x4[1][0], x4[2][0], x5[0][0], x5[1][0], x5[2][0], x6[0][0], x6[1][0], x6[2][0], x6[3][0], x7[0][0], x7[1][0], x7[2][0], x7[3][0]]
+        yp = state_out["yn"]
+        yn = state_out["yp"]
+        yep = state_out["yep"]
 
-    def reward_function(self, sensitivity_value):
+        dV_dDsn = sen_out["dV_dDsn"]
+        dV_dDsp = sen_out["dV_dDsp"]
+        dCse_dDsn = sen_out["dCse_dDsn"]
+        dCse_dDsp = sen_out["dCse_dDsp"]
+        dV_dEpsi_sn = sen_out["dV_dEpsi_sn"]
+        dV_dEpsi_sp = sen_out["dV_dEpsi_sp"]
+
+        return [yp, dV_dEpsi_sp]
+
+    @staticmethod
+    def reward_function(sensitivity_value):
 
         reward = sensitivity_value ** 2
 
@@ -69,13 +80,11 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         # err_msg = "%r (%s) invalid" % (action, type(action))
         # assert self.action_space.contains(action), err_msg
 
-        # self.SPMe.step()
-
-        [bat_states, new_sen_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse] = self.SPMe.step(full_sim=True, states=self.sim_state, I_input=action, state_of_charge=self.state_of_charge)
+        [bat_states, new_sen_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse, done_flag] = self.SPMe.step(full_sim=True, states=self.sim_state, I_input=action, state_of_charge=self.state_of_charge)
 
         self.sim_state = [bat_states, new_sen_states]
         self.state_output = outputs
-        self.state = (self.unpack_states(bat_states, new_sen_states))
+        self.state = (self.unpack_states(bat_states, new_sen_states, outputs, sensitivity_outputs))
         self.epsi_sp = sensitivity_outputs['dV_dEpsi_sp']
         self.term_volt = V_term
 
@@ -84,13 +93,11 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
 
         done = bool(self.state_of_charge < self.min_soc
                     or self.state_of_charge > self.max_soc
-                    or np.isnan(V_term))
+                    or np.isnan(V_term)
+                    or done_flag is True)
 
         if done is True:
-            print("SOC",self.state_of_charge)
-            print('Term Voltage', V_term)
-                    # or V_term < self.min_voltage
-                    # or V_term > self.max_voltage)
+            print("GYM env 'STEP' returned DONE = TRUE. Exit current Simulation & Reset")
 
         if not done:
             reward = self.reward_function(self.epsi_sp)
@@ -120,16 +127,16 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         # self.state_of_charge = self.np_random.uniform(low=-0.05, high=0.05, size=(4,))
         self.state_of_charge = self.SOC_0
 
-        [bat_states, new_sen_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse] = self.SPMe.step(
+        [bat_states, new_sen_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse, done] = self.SPMe.step(
             full_sim=True, states=self.state, I_input=0, state_of_charge=self.state_of_charge)
 
         self.sim_state = [bat_states, new_sen_states]
-        self.state = self.unpack_states(bat_states, new_sen_states)
+        self.state = self.unpack_states(bat_states, new_sen_states, outputs, sensitivity_outputs)
 
 
         self.steps_beyond_done = None
-        # return np.array(self.state)
-        return self.state
+        return np.array(self.state)
+        #return self.state
 
 
    # def render(self, mode='human'):
