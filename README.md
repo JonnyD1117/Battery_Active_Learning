@@ -33,3 +33,5 @@ One of the reasons why battery model selection is vital, is because, the fidelit
 
 ### Single Particle Models
 
+![Image of Yaktocat](https://octodex.github.com/images/yaktocat.png)
+
