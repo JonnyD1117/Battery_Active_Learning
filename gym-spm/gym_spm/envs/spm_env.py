@@ -7,16 +7,18 @@ import numpy as np
 
 class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
 
-    metadata = {'render.modes': ['human']}
+    # metadata = {'render.modes': ['human']}
 
     def __init__(self, time_step=1, SOC=.5):
         super(SingleParticleModelElectrolyte_w_Sensitivity).__init__()
 
+        self.num_envs =1
+
         self.time_step = time_step
         self.SPMe = SingleParticleModelElectrolyte_w_Sensitivity(timestep=self.time_step)
 
-        # state_limits = np.array([np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf], dtype=np.float32)
-        state_limits = np.array([np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf], dtype=np.float32)
+        state_limits = np.array([np.inf, np.inf], dtype=np.float32)
+        # state_limits = np.array([np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf], dtype=np.float32)
 
         max_C_val = np.array([25.67*3], dtype=np.float32)
 
@@ -32,6 +34,7 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
 
         self.action_space = spaces.Box(-max_C_val, max_C_val, dtype=np.float32)
         self.observation_space = spaces.Box(-state_limits, state_limits, dtype=np.float32)
+        # self.observation_space = spaces.Box(-np.inf, np.inf, shape=(2,) , dtype=np.float32)
 
         self.seed()
         self.viewer = None
@@ -45,7 +48,8 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
-    def unpack_states(self, bat_states, sen_states, state_out, sen_out):
+    @staticmethod
+    def unpack_states(bat_states, sen_states, state_out, sen_out):
 
         x1 = bat_states['xn']
         x2 = bat_states['xp']
@@ -56,8 +60,8 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         x6 = sen_states['Sdsp_p']
         x7 = sen_states['Sdsn_n']
 
-        yp = state_out["yn"]
-        yn = state_out["yp"]
+        yn = state_out["yn"]
+        yp = state_out["yp"]
         yep = state_out["yep"]
 
         dV_dDsn = sen_out["dV_dDsn"]
@@ -67,7 +71,7 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         dV_dEpsi_sn = sen_out["dV_dEpsi_sn"]
         dV_dEpsi_sp = sen_out["dV_dEpsi_sp"]
 
-        return [yp, dV_dEpsi_sp]
+        return [yp.item(), dV_dEpsi_sp.item()]
 
     @staticmethod
     def reward_function(sensitivity_value):
@@ -84,7 +88,7 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
 
         self.sim_state = [bat_states, new_sen_states]
         self.state_output = outputs
-        self.state = (self.unpack_states(bat_states, new_sen_states, outputs, sensitivity_outputs))
+        self.state = self.unpack_states(bat_states, new_sen_states, outputs, sensitivity_outputs)
         self.epsi_sp = sensitivity_outputs['dV_dEpsi_sp']
         self.term_volt = V_term
 
@@ -118,6 +122,9 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
             self.steps_beyond_done += 1
             reward = 0.0
 
+            print(np.size(self.state))
+            print(np.size(np.array(self.state)))
+
         return np.array(self.state), reward, done, {}
 
     def reset(self):
@@ -128,15 +135,13 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         self.state_of_charge = self.SOC_0
 
         [bat_states, new_sen_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse, done] = self.SPMe.step(
-            full_sim=True, states=self.state, I_input=0, state_of_charge=self.state_of_charge)
+            full_sim=True, states=self.sim_state, I_input=0, state_of_charge=self.state_of_charge)
 
         self.sim_state = [bat_states, new_sen_states]
-        self.state = self.unpack_states(bat_states, new_sen_states, outputs, sensitivity_outputs)
-
+        self.state = (self.unpack_states(bat_states, new_sen_states, outputs, sensitivity_outputs))
 
         self.steps_beyond_done = None
         return np.array(self.state)
-        #return self.state
 
 
    # def render(self, mode='human'):
