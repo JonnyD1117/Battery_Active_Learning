@@ -8,7 +8,6 @@ This Repo is the consolidation of models and code to implement the a RL Agent wh
 - [x] Use battery API as the starting point to wrap the battery for training in OpenAI Gym as a custom environment
 - [x] Troubleshoot model numerical stability and performance problems 
 - [ ] Use 'Policy Gradient' methods from StableBaselines3 (Pytorch version) to train Agent 
-- [ ] 
 
 # Installation
 
@@ -31,7 +30,10 @@ For the purpose of this repository, the DFN battery model is too complex and com
 
 One of the reasons why battery model selection is vital, is because, the fidelity of the model driving the battery state dyamics is also the limiting factor in the fidelity of the 'battery parameter sensitivities' which are key information states to supply to the active learning agent.   
 
-### Single Particle Models
+## Single Particle Models
 
 ![Single Particle Model](https://drive.google.com/file/d/11ps-gMi7Xn2pwQ_Eea-y7FvjgS4jwV1Q/view?usp=sharing)
+
+## Active Learning via OpenAI Gym 
+
 
