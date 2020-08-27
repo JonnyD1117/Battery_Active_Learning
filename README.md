@@ -22,5 +22,14 @@ To the package for 'Battery_Active_Learning', please use the following commands 
  pip install -e gym-spm
 ```
 
-# Modeling 
+# Modeling
+
+## Battery Modeling 
+The majority of models for battery applications where high-fidelity deterministic models are desireable are derived from the Doyle-Fuller-Newman (DFN) Mode. The DFN model is a first principles battery model, whose governing equations are derived by considering the diffusion (Fick's 2nd Law) and electrochemical dynamics (Butler-Volmer Eqns). While hypothetically the DFN models all behaviors of interest in a battery, the couple partial derivative system of equations which model uses pose a serious problem for many useful applications, as exact solutions do not exist and numerical solution methods must be employed to discretize the spatial and temporal domains of the governing equations, merely to be able to compute a solution. Naturally, models of this complexity are rarely used "as is" and are typically reduced in complexity by applying specific simplifying assumptions, such that the resulting model is more desirable computational characteristics, or is at least more manageable to use than the full order model. 
+
+For the purpose of this repository, the DFN battery model is too complex and computationally expensive to start off with a proof of concept. As of now, the battery model driving the OpenAI Gym 'environment' is the Single Particle Model with Electrolyte dynamics (SPMe). This model is simple enough to implement (even if its' derviation is long and protracted) and provides an acceptable balance between computational cost against model fidelity. This means that the model (at moderate C-Rates: +-3C) should accurately predict, no-trivial dynamics which the battery is experiencing during operation. For this reason, the SPMe model is mathematical foundation for the code in this repository. 
+
+One of the reasons why battery model selection is vital, is because, the fidelity of the model driving the battery state dyamics is also the limiting factor in the fidelity of the 'battery parameter sensitivities' which are key information states to supply to the active learning agent.   
+
+### Single Particle Models
 
