@@ -1,7 +1,15 @@
 # Battery_Active_Learning
-This Repo is the consolidation of models and code to implement the a RL Agent which learns how to maximizes the sensitivity of the a battery to produce better estimation results by exploiting near optimal Fisher Information
+This Repo is the consolidation of models and code to implement a RL Agent which learns how to maximizes the sensitivity of the a battery to produce better estimation results by exploiting near optimal Fisher Information. The main idea behind this repository comes from combining battery modeling and estimation with reinforcement learning. 
 
-## High Level Objectives 
+
+##The objective of this repo is to develop an RL Agent, who can "train" on a battery (simulated or physical) and learn the 'policy' which maximizes the Fisher Information metric, for given battery parameters. 
+
+## Motivation 
+The motivation for this project is achieve a RL agent capable of being able to produce battery inputs which maximizes the batteries sensitivity to specific parameters. If the sensitivity with respect to theses parameters are large, theoretically, it becomes easy to estimate the value of these parameters, as the output voltage will contain more information about the parameter of interest, due to the agent stimulating the battery with inputs that increase this information. 
+
+The benefit of measureable quantities, like output voltage, being able to contain 'more' information (even in a latent form) about  parameters means that given the estimated value for the battery parameter, classical estimators (like Kalman or Particle Filters) will produce lower variance estimates that allow the estimator to track the internal states of the system more accurately. 
+
+## ToDo List
 
 - [x] Implemenet Single Particle Model with Electrolyte dynamics (SPMe) battery model in Python 
 - [x] Abstract operation of SPMe operation using simple OOP/Class based API 
