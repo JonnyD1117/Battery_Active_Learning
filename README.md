@@ -3,12 +3,12 @@ This Repo is the consolidation of models and code to implement the a RL Agent wh
 
 ## High Level Objectives 
 
--[x] Implemenet Single Particle Model with Electrolyte dynamics (SPMe) battery model in Python 
--[x] Abstract operation of SPMe operation using simple OOP/Class based API 
--[x] Use battery API as the starting point to wrap the battery for training in OpenAI Gym as a custom environment
--[x] Troubleshoot model numerical stability and performance problems 
--[ ] Use 'Policy Gradient' methods from StableBaselines3 (Pytorch version) to train Agent 
--[ ] 
+- [x] Implemenet Single Particle Model with Electrolyte dynamics (SPMe) battery model in Python 
+- [x] Abstract operation of SPMe operation using simple OOP/Class based API 
+- [x] Use battery API as the starting point to wrap the battery for training in OpenAI Gym as a custom environment
+- [x] Troubleshoot model numerical stability and performance problems 
+- [ ] Use 'Policy Gradient' methods from StableBaselines3 (Pytorch version) to train Agent 
+- [ ] 
 
 # Installation
 
