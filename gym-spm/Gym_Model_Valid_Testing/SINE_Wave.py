@@ -28,7 +28,7 @@ for t in range(0, len(time)-1):
     # STEP func.
     if done:
         pass
-        print("BREAK OCCURED")
+        print("BREAK OCCURRED")
         break
 
 
