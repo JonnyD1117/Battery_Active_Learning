@@ -1,7 +1,0 @@
-README.md
-setup.py
-gym_newcartpole.egg-info/PKG-INFO
-gym_newcartpole.egg-info/SOURCES.txt
-gym_newcartpole.egg-info/dependency_links.txt
-gym_newcartpole.egg-info/requires.txt
-gym_newcartpole.egg-info/top_level.txt
