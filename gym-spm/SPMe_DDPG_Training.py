@@ -15,24 +15,36 @@ from stable_baselines3.td3.policies import MlpPolicy
 from stable_baselines3.common.noise import NormalActionNoise
 
 if __name__ == '__main__':
+    # Instantiate Environment
     env_id = 'gym_spm:spm-v0'
-    num_cpu = 4  # Number of processes to use
-
-    train = True
-
     env = gym.make('gym_spm:spm-v0')
 
-    # The noise objects for DDPG
+    # HyperParameters
+
+    # Training  & Logging Setup
+    train_model = True
+    train_version = 1
+    description = "DDPG_Policy_MLP"
+
+    log_dir = "./Logs/DDPG/"
+    model_dir = "./Models/DDPG/"
+
+    details = f"Model_v{train_version}_" + description
+
+    log_dir_description = log_dir + details
+    model_dir_description = model_dir + details
+
+    # Instantiate Model
     n_actions = env.action_space.shape[-1]
     action_noise = NormalActionNoise(mean=np.zeros(n_actions), sigma=25.67 * np.ones(n_actions))
-    model = DDPG(MlpPolicy, env, action_noise=action_noise, verbose=1, tensorboard_log="./DDPG_spm_v2_SOC_point5_two_state/")
-    # model = TD3(MlpPolicy, env, action_noise=action_noise, verbose=1, tensorboard_log="./TD3_spm_v2_SOC_point5_two_state/")
+    model = DDPG(MlpPolicy, env, action_noise=action_noise, verbose=1, tensorboard_log=log_dir)
 
-    if train:
-        model.learn(total_timesteps=2500000, tb_log_name='test_run_3_SOCpoint5_two_state')
-        model.save('TD3_test_3_SOC_point5_two_states')
+    # Train OR Load Model
+    if train_model:
+        model.learn(total_timesteps=25000, tb_log_name=details)
+        model.save(model_dir_description)
     else:
-        model.load('TD3_test_2_SOC_point5_two_states')
+        model.load(model_dir_description)
 
     mean_reward, std_reward = evaluate_policy(model, model.get_env(), n_eval_episodes=10)
     
