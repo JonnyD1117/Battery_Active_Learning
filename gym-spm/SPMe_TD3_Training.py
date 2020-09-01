@@ -18,22 +18,22 @@ if __name__ == '__main__':
     env_id = 'gym_spm:spm-v0'
     num_cpu = 4  # Number of processes to use
 
-    train = True
-
     env = gym.make('gym_spm:spm-v0')
+    # env = make_vec_env(env_id, n_envs=1, seed=0)
+    # env = VecCheckNan(env, raise_exception=True)
+    # env = check_env(env)
 
     # The noise objects for DDPG
     n_actions = env.action_space.shape[-1]
     action_noise = NormalActionNoise(mean=np.zeros(n_actions), sigma=25.67 * np.ones(n_actions))
-    model = DDPG(MlpPolicy, env, action_noise=action_noise, verbose=1, tensorboard_log="./DDPG_spm_v2_SOC_point5_two_state/")
+
     # model = TD3(MlpPolicy, env, action_noise=action_noise, verbose=1, tensorboard_log="./TD3_spm_v2_SOC_point5_two_state/")
+    model = DDPG(MlpPolicy, env, action_noise=action_noise, verbose=1, tensorboard_log="./DDPG_spm_v2_SOC_point5_two_state/")
+    model.learn(total_timesteps=25000, tb_log_name='DDPG_test_run_3_SOCpoint5_two_state')
+    model.save('DDPG_test_3_SOC_point5_two_states')
 
-    if train:
-        model.learn(total_timesteps=2500000, tb_log_name='test_run_3_SOCpoint5_two_state')
-        model.save('TD3_test_3_SOC_point5_two_states')
-    else:
-        model.load('TD3_test_2_SOC_point5_two_states')
 
+    model.load('DDPG_test_2_SOC_point5_two_states')
     mean_reward, std_reward = evaluate_policy(model, model.get_env(), n_eval_episodes=10)
     
     print("Mean Reward = ", mean_reward)

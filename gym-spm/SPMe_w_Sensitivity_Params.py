@@ -703,12 +703,12 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
         if soc_new[1] < .07 or soc_new[0] < .005 or soc_new[1] > 1 or soc_new[0] > 1 or np.isnan(V_term) is True:
             done_flag = True
 
-            print("SOC 1:", soc_new[1])
-            print("SOC 2:", soc_new[0])
-            print("V-term", V_term)
-            print("** From SPMe Step ^ **")
-
-            print("SPMe 'STEP' returned DONE = TRUE :. Pass DONE flag to direction SIM method or external function")
+            # print("SOC 1:", soc_new[1])
+            # print("SOC 2:", soc_new[0])
+            # print("V-term", V_term)
+            # print("** From SPMe Step ^ **")
+            #
+            # print("SPMe 'STEP' returned DONE = TRUE :. Pass DONE flag to direction SIM method or external function")
             return [init_bat_states, sensitivity_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse, done_flag]
 
         else:
