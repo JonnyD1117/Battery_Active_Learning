@@ -12,13 +12,13 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
     def __init__(self, time_step=1, SOC=.5):
         super(SingleParticleModelElectrolyte_w_Sensitivity).__init__()
 
+        self.max_sen = 0
+
         self.time_step = time_step
         self.SPMe = SingleParticleModelElectrolyte_w_Sensitivity(timestep=self.time_step)
 
         state_limits = np.array([np.inf, np.inf], dtype=np.float32)
-        # state_limits = np.array([np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf], dtype=np.float32)
-
-        max_C_val = np.array([25.67*3], dtype=np.float32)
+        max_C_val = np.array([25.67*5], dtype=np.float32)
 
         self.SOC_0 = SOC
         self.state_of_charge = SOC
@@ -41,6 +41,7 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         self.steps_beyond_done = None
         self.np_random = None
         self.state_output = None
+        self.re = None
 
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -71,16 +72,29 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
 
         return [yp.item(), dV_dEpsi_sp.item()]
 
-    @staticmethod
-    def reward_function(sensitivity_value):
+    def reward_function(self, sensitivity_value, action):
 
-        reward = sensitivity_value ** 2
+        reward = sensitivity_value**2
+        # if action >= 25.67*3 or action <= -25.67*3:
+        #     action_penalty = -100
+        # else:
+        #     action_penalty = 0
+        #
+        # if np.abs(sensitivity_value) > self.max_sen:
+        #
+        #     sen_reward = 1
+        #     self.max_sen = sensitivity_value
+        # else:
+        #     sen_reward = 0
+        #
+        # reward = action_penalty + sen_reward
 
         return reward
 
     def step(self, action):
         # err_msg = "%r (%s) invalid" % (action, type(action))
         # assert self.action_space.contains(action), err_msg
+
 
         [bat_states, new_sen_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse, done_flag] = self.SPMe.step(full_sim=True, states=self.sim_state, I_input=action, state_of_charge=self.state_of_charge)
 
@@ -100,15 +114,18 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
 
         if done is True:
             pass
-            # print("GYM env 'STEP' returned DONE = TRUE. Exit current Simulation & Reset")
+            # # print("GYM env 'STEP' returned DONE = TRUE. Exit current Simulation & Reset")
+            # self.reset()
 
         if not done:
-            reward = self.reward_function(self.epsi_sp)
+            reward = self.reward_function(self.epsi_sp, action)
+            self.re = reward
 
         elif self.steps_beyond_done is None:
             # Pole just fell!
             self.steps_beyond_done = 0
-            reward = self.reward_function(self.epsi_sp)
+            reward = self.reward_function(self.epsi_sp, action)
+            self.re = reward
 
         else:
             if self.steps_beyond_done == 0:
@@ -128,7 +145,7 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         self.sim_state = None
         # self.state_of_charge = np.random.uniform(low=.25, high=.98)
         self.state_of_charge = self.SOC_0
-        print(self.state_of_charge)
+        # print(self.state_of_charge)
 
         [bat_states, new_sen_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse, done] = self.SPMe.step(
             full_sim=True, states=self.sim_state, I_input=0, state_of_charge=self.state_of_charge)
