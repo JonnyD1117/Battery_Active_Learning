@@ -29,8 +29,10 @@ class TensorboardCallback(BaseCallback):
         # Log scalar value (here a random variable)
         value = np.random.random()
         self.logger.record('random_value', value)
-        self.logger.record('SOC', env.state_of_charge)
-        self.logger.record('Reward', env.re)
+        self.logger.record('train/SOC', env.state_of_charge)
+        self.logger.record('train/Reward', env.re)
+        
+        # print(self.model)
         return True
 
 
@@ -38,15 +40,13 @@ if __name__ == '__main__':
     # Instantiate Environment
     env_id = 'gym_spm:spm-v0'
     env = gym.make('gym_spm:spm-v0')
-    # env = Monitor(env)
-
 
     # HyperParameters
     lr = 3e-4
 
     # Training  & Logging Setup
     train_model = True
-    train_version = 3
+    train_version = 4
     description = "DDPG_Policy_MLP"
 
     log_dir = "./Logs/DDPG/"
@@ -60,11 +60,13 @@ if __name__ == '__main__':
     # Instantiate Model
     n_actions = env.action_space.shape[-1]
     action_noise = NormalActionNoise(mean=np.zeros(n_actions), sigma=0.1 * np.ones(n_actions))
-    model = DDPG(MlpPolicy, env, action_noise=action_noise, verbose=1, tensorboard_log=log_dir, n_episodes_rollout=-1, train_freq=10, learning_rate=lr)
+    model = DDPG('MlpPolicy', env, action_noise=action_noise, verbose=1, tensorboard_log=log_dir)
+    # model = PPO('MlpPolicy', env, tensorboard_log=log_dir)
+
 
     # Train OR Load Model
     if train_model:
-        model.learn(total_timesteps=25000, tb_log_name=details, callback=TensorboardCallback(env))
+        model.learn(total_timesteps=2500000, tb_log_name=details, callback=TensorboardCallback(env))
         # model.learn(total_timesteps=25000, tb_log_name=details)
 
         # model.save(model_dir_description)
@@ -88,12 +90,7 @@ if __name__ == '__main__':
         obs, rewards, done, info = env.step(action)
     
         epsi_sp_list.append(env.epsi_sp.item(0))
-        # Concentration_list.append(env.state_output['yp'].item())
-        # Concentration_list.append(env.state_output['yn'].item())
-        # soc_list.append(env.state_of_charge.item())
         soc_list.append(env.state_of_charge.item())
-
-    
         action_list.append(action)
     
         if done:
@@ -103,7 +100,6 @@ if __name__ == '__main__':
     plt.figure()
     plt.plot(soc_list)
     plt.show()
-    
     
     plt.figure()
     plt.plot(epsi_sp_list)

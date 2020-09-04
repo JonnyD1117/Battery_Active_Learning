@@ -104,7 +104,9 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         self.epsi_sp = sensitivity_outputs['dV_dEpsi_sp']
         self.term_volt = V_term
 
-        self.state_of_charge = soc_new[1]
+        print(self.epsi_sp.item())
+
+        self.state_of_charge = soc_new[1].item()
         # self.state = [bat_states, new_sen_states]
 
         done = bool(self.state_of_charge < self.min_soc
@@ -112,19 +114,19 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
                     or np.isnan(V_term)
                     or done_flag is True)
 
-        if done is True:
-            pass
-            # # print("GYM env 'STEP' returned DONE = TRUE. Exit current Simulation & Reset")
-            # self.reset()
+        # if done is True:
+        #     pass
+        #     # # print("GYM env 'STEP' returned DONE = TRUE. Exit current Simulation & Reset")
+        #     # self.reset()
 
         if not done:
-            reward = self.reward_function(self.epsi_sp, action)
+            reward = self.reward_function(self.epsi_sp.item(), action)
             self.re = reward
 
         elif self.steps_beyond_done is None:
             # Pole just fell!
             self.steps_beyond_done = 0
-            reward = self.reward_function(self.epsi_sp, action)
+            reward = self.reward_function(self.epsi_sp.item(), action)
             self.re = reward
 
         else:
@@ -151,7 +153,7 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
             full_sim=True, states=self.sim_state, I_input=0, state_of_charge=self.state_of_charge)
 
         self.sim_state = [bat_states, new_sen_states]
-        self.state = (self.unpack_states(bat_states, new_sen_states, outputs, sensitivity_outputs))
+        self.state = self.unpack_states(bat_states, new_sen_states, outputs, sensitivity_outputs)
 
         self.steps_beyond_done = None
         return np.array(self.state)
