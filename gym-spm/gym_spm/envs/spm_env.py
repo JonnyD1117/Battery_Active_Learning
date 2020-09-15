@@ -13,6 +13,7 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         super(SingleParticleModelElectrolyte_w_Sensitivity).__init__()
 
         self.max_sen = 0
+        self.C_se = None
 
         self.time_step = time_step
         self.SPMe = SingleParticleModelElectrolyte_w_Sensitivity(timestep=self.time_step)
@@ -96,7 +97,8 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         # assert self.action_space.contains(action), err_msg
 
 
-        [bat_states, new_sen_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse, done_flag] = self.SPMe.step(full_sim=True, states=self.sim_state, I_input=action, state_of_charge=self.state_of_charge)
+        [bat_states, new_sen_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse, done_flag] \
+            = self.SPMe.step(full_sim=True, states=self.sim_state, I_input=action, state_of_charge=self.state_of_charge)
 
         self.sim_state = [bat_states, new_sen_states]
         self.state_output = outputs
@@ -106,6 +108,7 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
 
         print(self.epsi_sp.item())
 
+        self.C_se = theta[1].item()
         self.state_of_charge = soc_new[1].item()
         # self.state = [bat_states, new_sen_states]
 

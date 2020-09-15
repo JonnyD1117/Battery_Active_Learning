@@ -6,19 +6,9 @@ from SPMe_Baseline_Params import SPMe_Baseline_Parameters
 
 
 class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
-    def __init__(self, init_soc=.5, custom_params=None, timestep=1, sim_time=3600, voltage_limiter=True):
+    def __init__(self, custom_params=None, timestep=1, sim_time=3600, voltage_limiter=True):
 
         self.limit_term_volt = voltage_limiter
-        self.SOC_0 = init_soc
-        self.initial_state = self.compute_init_states()
-
-        Sepsi_p_old = np.array([[0], [0], [0]])
-        Sepsi_n_old = np.array([[0], [0], [0]])
-        Sdsp_p_old = np.array([[0], [0], [0], [0]])
-        Sdsn_n_old = np.array([[0], [0], [0], [0]])
-
-        self.initial_sen_state = {"Sepsi_p": Sepsi_p_old, "Sepsi_n": Sepsi_n_old, "Sdsp_p": Sdsp_p_old,
-                              "Sdsn_n": Sdsn_n_old}
 
         # Initialize Default Parameters
         self.param = {}
@@ -189,20 +179,6 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
         self.Sdsn_B_dn = self.Sdsn_B * Ts
         self.Sdsn_C_dn = self.Sdsn_C
         self.Sdsn_D_dn = self.Sdsn_D
-
-    def compute_init_states(self):
-        stoi_n, stoi_p = self.compute_Stoich_coef(self.SOC_0)
-
-        # IF no initial state is supplied to the "step" method, treat step as initial step
-        xn_old = np.array([[(stoi_n * self.param['cs_max_n']) / (self.param['rfa_n'] * 10395 * (self.param['Ds_n'] ** 2))], [0],
-                           [0]])  # stoi_n100 should be changed if the initial soc is not equal to 50 %
-        xp_old = np.array([[(stoi_p * self.param['cs_max_p']) / (self.param['rfa_p'] * 10395 * (self.param['Ds_p'] ** 2))], [0],
-                           [0]])  # initial positive electrode ion concentration
-        xe_old = np.array([[0], [0]])
-
-        bat_states = {"xn": xn_old, "xp": xp_old, "xe": xe_old}
-
-        return bat_states
 
     def import_custom_parameters(self, new_param_dict):
 
@@ -534,30 +510,12 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
 
         return [xn, xp, xe, yn, yp, yep, theta_n, theta_p, docv_dCse_n, docv_dCse_p, V_term, time, input_cur_prof, soc_list, dV_dDsn, dV_dDsp, dCse_dDsn, dCse_dDsp, dV_dEpsi_sn, dV_dEpsi_sp]
 
-    def step(self, states=None, I_input=None, full_sim=False):
+    def step(self, states=None, I_input=None, state_of_charge=None, full_sim=False):
         """
         step function runs one iteration of the model given the input current and returns output states and quantities
         States: dict(), I_input: scalar, state_of_charge: scalar
 
         """
-
-        if states is None:
-            raise Exception
-
-        init_bat_states = states[0]
-        init_sensitivity_states = states[1]
-
-        bat_states = init_bat_states
-        sensitivity_states = init_sensitivity_states
-
-        xn_old = init_bat_states['xn']
-        xp_old = init_bat_states['xp']
-        xe_old = init_bat_states['xe']
-
-
-        outputs = {"yn": None, "yp": None, "yep": None}
-
-        sensitivity_outputs = {"dV_dDsn": None, "dV_dDsp": None, "dCse_dDsn": None, "dCse_dDsp": None, "dV_dEpsi_sn": None, "dV_dEpsi_sp": None}
 
         done_flag = False
 
@@ -587,6 +545,7 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
         # If FULL SIM is set True: Shortciruit SIM "I" & "SOC" values into step model (Does not Check for None inputs or default values)
         if full_sim is True:
             I = I_input
+            soc = state_of_charge
 
             if I == 0:
                 I = .000000001
@@ -596,6 +555,46 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
                 I = self.default_current     # If no input signal is provided use CC @ default input value
             else:
                 I = I_input
+
+            # Initialize SOC
+            if state_of_charge is None:
+                soc = .5                    # If no SOC is provided by user then defaults to SOC = .5
+            else:
+                soc = state_of_charge
+
+        # Initialize "State" Vector
+        if states is None:
+            stoi_n, stoi_p = self.compute_Stoich_coef(soc)
+
+            # IF no initial state is supplied to the "step" method, treat step as initial step
+            xn_old = np.array([[(stoi_n * cs_max_n) / (rfa_n * 10395 * (Ds_n ** 2))], [0], [0]])  # stoi_n100 should be changed if the initial soc is not equal to 50 %
+            xp_old = np.array([[(stoi_p * cs_max_p) / (rfa_p * 10395 * (Ds_p ** 2))], [0], [0]])  # initial positive electrode ion concentration
+            xe_old = np.array([[0], [0]])
+
+            Sepsi_p_old = np.array([[0], [0], [0]])
+            Sepsi_n_old = np.array([[0], [0], [0]])
+            Sdsp_p_old = np.array([[0], [0], [0], [0]])
+            Sdsn_n_old = np.array([[0], [0], [0], [0]])
+
+            bat_states = {"xn": xn_old, "xp": xp_old, "xe": xe_old}
+            outputs = {"yn": None, "yp": None, "yep": None}
+
+            init_bat_states = bat_states
+
+            sensitivity_states = {"Sepsi_p": Sepsi_p_old, "Sepsi_n": Sepsi_n_old, "Sdsp_p": Sdsp_p_old, "Sdsn_n": Sdsn_n_old}
+            sensitivity_outputs = {"dV_dDsn": None, "dV_dDsp": None, "dCse_dDsn": None, "dCse_dDsp": None, "dV_dEpsi_sn": None, "dV_dEpsi_sp": None}
+
+        else:
+            bat_states = states[0]
+            init_bat_states = bat_states
+            init_sen_states = states[1]
+
+            # ELSE use given states information to propagate model forward in time
+            xn_old, xp_old, xe_old = bat_states["xn"], bat_states["xp"], bat_states["xe"]
+            outputs = {"yn": None, "yp": None, "yep": None}
+
+            sensitivity_states = init_sen_states
+            sensitivity_outputs = {"dV_dDsn": None, "dV_dDsp": None, "dCse_dDsn": None, "dCse_dDsp": None, "dV_dEpsi_sn": None, "dV_dEpsi_sp": None}
 
         # Molar Current Flux Density (Assumed UNIFORM for SPM)
         Jn = I / Vn
@@ -704,11 +703,26 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
         if soc_new[1] < .07 or soc_new[0] < .005 or soc_new[1] > 1 or soc_new[0] > 1 or np.isnan(V_term) is True:
             done_flag = True
 
+            # print("SOC 1:", soc_new[1])
+            # print("SOC 2:", soc_new[0])
+            # print("V-term", V_term)
+            # print("** From SPMe Step ^ **")
+            #
+            # print("SPMe 'STEP' returned DONE = TRUE :. Pass DONE flag to direction SIM method or external function")
             return [init_bat_states, sensitivity_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse, done_flag]
 
         else:
 
             return [bat_states, new_sen_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse, done_flag]
+
+
+        # # # if V_term <= 2.75 and self.limit_term_volt is True:
+        # # if yn_new < 0 or yp_new < 0:
+        # if soc_new[1] < .1 or soc_new[1] < .1 or soc_new[0] < .1 or soc_new[0] < .1 or soc_new[1] < .98 or soc_new[1] < .98 or soc_new[0] < .98 or soc_new[0] < .98 or np.isnan(V_term) is True :
+        #
+        #     return [init_bat_states, sensitivity_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse]
+        # else:
+        #     return [bat_states, new_sen_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse]
 
 
 if __name__ == "__main__":
