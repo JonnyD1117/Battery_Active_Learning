@@ -8,17 +8,9 @@ from SPMe_Baseline_Params import SPMe_Baseline_Parameters
 class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
     def __init__(self, init_soc=.5, custom_params=None, timestep=1, sim_time=3600, voltage_limiter=True):
 
+        # print("Battery model CLASS Init Called")
         self.limit_term_volt = voltage_limiter
         self.SOC_0 = init_soc
-        self.initial_state = self.compute_init_states()
-
-        Sepsi_p_old = np.array([[0], [0], [0]])
-        Sepsi_n_old = np.array([[0], [0], [0]])
-        Sdsp_p_old = np.array([[0], [0], [0], [0]])
-        Sdsn_n_old = np.array([[0], [0], [0], [0]])
-
-        self.initial_sen_state = {"Sepsi_p": Sepsi_p_old, "Sepsi_n": Sepsi_n_old, "Sdsp_p": Sdsp_p_old,
-                              "Sdsn_n": Sdsn_n_old}
 
         # Initialize Default Parameters
         self.param = {}
@@ -42,6 +34,21 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
 
         else:
             self.param = {self.param_key_list[i]: self.default_param_vals[i] for i in range(0, len(self.param_key_list))}
+
+        # Initialize the "battery" and 'sensitivity' states (FOR STEP METHOD)
+        self.initial_state = self.compute_init_states()
+
+        Sepsi_p_old = np.array([[0], [0], [0]])
+        Sepsi_n_old = np.array([[0], [0], [0]])
+        Sdsp_p_old = np.array([[0], [0], [0], [0]])
+        Sdsn_n_old = np.array([[0], [0], [0], [0]])
+
+        self.initial_sen_state = {"Sepsi_p": Sepsi_p_old, "Sepsi_n": Sepsi_n_old, "Sdsp_p": Sdsp_p_old,
+                                  "Sdsn_n": Sdsn_n_old}
+
+        # Initialize the "system" states for use in SIM method
+        self.full_init_state = [self.initial_state, self.initial_sen_state]
+        self.next_full_state = [self.initial_state, self.initial_sen_state]
 
         # Simulation Settings
         self.dt = timestep
@@ -104,31 +111,6 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
         self.Be_dp = self.Bep * Ts
         self.Ce_dp = self.Cep
         self.De_dp = self.Dep
-
-        # print(self.A_dp)
-        # print("-----------------------------------------------------------")
-        # print(self.B_dp)
-        # print("-----------------------------------------------------------")
-        # print(self.C_dp)
-        # print("-----------------------------------------------------------")
-        # print(self.D_dp)
-
-        # print(self.A_dn)
-        # print("-----------------------------------------------------------")
-        # print(self.B_dn)
-        # print("-----------------------------------------------------------")
-        # print(self.C_dn)
-        # print("-----------------------------------------------------------")
-        # print(self.D_dn)
-
-        # print(self.Ae_dp)
-        # print("-----------------------------------------------------------")
-        # print(self.Be_dp)
-        # print("-----------------------------------------------------------")
-        # print(self.Ce_dp)
-        # print("-----------------------------------------------------------")
-        # print(self.De_dp)
-
 
         # Sensitivities
         # sensitivity realization in time domain for epsilon_sp from third order pade(you can refer to my slides)
@@ -333,6 +315,8 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
         # plt.plot(time, dV_dEpsi_sp * self.param['epsilon_sp'])
         plt.plot(time, dV_dEpsi_sp * self.param['epsilon_sp'])
 
+        # print(current)
+
         plt.xlabel("Time (seconds)")
         plt.ylabel(" epsilon_sp Sensitivity ")
         plt.title("Time vs epsilon_sp Sensitivity")
@@ -492,7 +476,9 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
             # When CC is False use User defined list as input current value
             input_current = I_input                     # IF CC "False" custom input profile (assumed correct Length)
 
-        input_state = init_state            # Pass Initial value of State to the "step()" method for handling
+        # input_state = init_state            # Pass Initial value of State to the "step()" method for handling
+        input_state = self.full_init_state    # Pass Initial value of State to the "step()" method for handling
+
 
         # Main Simulation Loop
         for k in range(0, Kup):
@@ -501,7 +487,7 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
             else:
                 input_current = input_current
             # Perform one iteration of simulation using "step" method
-            bat_states, sen_states, outputs, sen_outputs, soc_new, V_out, theta, docv_dCse, done = self.step(input_state, input_current[k], init_SOC, full_sim=True)
+            bat_states, sen_states, outputs, sen_outputs, soc_new, V_out, theta, docv_dCse, done = self.step(input_state, input_current[k], full_sim=True)
 
             # Record Desired values for post-simulation plotting/analysis
             xn[:, [k]], xp[:, [k]], xe[:, [k]] = bat_states["xn"], bat_states["xp"], bat_states["xe"]
@@ -515,6 +501,7 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
             # print(docv_dCse_n[k])
 
             if done:
+                val_len = k
                 break
 
             if V_term[k] <= 2.75 and trim_results is True:
@@ -540,27 +527,31 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
         States: dict(), I_input: scalar, state_of_charge: scalar
 
         """
-
         if states is None:
-            raise Exception
+            raise Exception("System States are of type NONE!")
 
+        # Declare INITIAL state variables
         init_bat_states = states[0]
         init_sensitivity_states = states[1]
 
-        bat_states = init_bat_states
-        sensitivity_states = init_sensitivity_states
-
+        # Unpack Initial battery state variables from dict for use in state space computation
         xn_old = init_bat_states['xn']
         xp_old = init_bat_states['xp']
         xe_old = init_bat_states['xe']
 
+        # Declare New state variables to be "overwritten" by output of the state space computation
+        bat_states = init_bat_states
+        sensitivity_states = init_sensitivity_states
 
+        # Declare state space outputs
         outputs = {"yn": None, "yp": None, "yep": None}
-
         sensitivity_outputs = {"dV_dDsn": None, "dV_dDsp": None, "dCse_dDsn": None, "dCse_dDsp": None, "dV_dEpsi_sn": None, "dV_dEpsi_sp": None}
 
+        # Set DONE flag to false: NOTE - done flag indicates whether model encountered invalid state. This flag is exposed
+        # to the user via the output and is used to allow the "step" method to terminate higher level functionality/simulations.
         done_flag = False
 
+        # Declare LOCAL copy of Battery parameters
         [epsilon_sn, epsilon_sp, epsilon_e_n, epsilon_e_p, F, Rn,
          Rp, R, T, Ar_n, Ar_p, Ln, Lp, Lsep, Lc, Ds_n, Ds_p, De,
          De_p, De_n, kn, kp, stoi_n0, stoi_n100, stoi_p0, stoi_p100,
@@ -655,6 +646,8 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
         new_sen_states, new_sen_outputs = self.compute_Sensitivities(I, Jn, Jp, i_0n, i_0p, k_n, k_p, theta_n, theta_p, docv_dCse_n, docv_dCse_p, sensitivity_states)
         sensitivity_outputs = new_sen_outputs
 
+        self.next_full_state = [bat_states, new_sen_states]
+
         # dV_dDsn, dV_dDsp, dCse_dDsn, dCse_dDsp, dV_dEpsi_sn, dV_dEpsi_sp = new_sen_outputs["dV_dDsn"], new_sen_outputs["dV_dDsp"], new_sen_outputs["dCse_dDsn"], new_sen_outputs["dCse_dDsp"], new_sen_outputs["dV_dEpsi_sn"], new_sen_outputs["dV_dEpsi_sp"]
 
         docv_dCse = [docv_dCse_n, docv_dCse_p]
@@ -713,11 +706,11 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
 
 if __name__ == "__main__":
 
-    SPMe = SingleParticleModelElectrolyte_w_Sensitivity(sim_time=1300,)
+    SPMe = SingleParticleModelElectrolyte_w_Sensitivity(sim_time=3600, init_soc=1)
 
-    # [xn, xp, xe, yn, yp, yep, theta_n, theta_p, docv_dCse_n, docv_dCse_p, V_term,
-    #  time, current, soc, dV_dDsn, dV_dDsp, dCse_dDsn, dCse_dDsp, dV_dEpsi_sn, dV_dEpsi_sp]\
-    #     = SPMe.sim(CC=True, zero_init_I=True, I_input=[-25.67*3], init_SOC=0, plot_results=True)
+    [xn, xp, xe, yn, yp, yep, theta_n, theta_p, docv_dCse_n, docv_dCse_p, V_term,
+     time, current, soc, dV_dDsn, dV_dDsp, dCse_dDsn, dCse_dDsp, dV_dEpsi_sn, dV_dEpsi_sp]\
+        = SPMe.sim(CC=True, zero_init_I=False, I_input=[25.67], plot_results=True)
 
 
 

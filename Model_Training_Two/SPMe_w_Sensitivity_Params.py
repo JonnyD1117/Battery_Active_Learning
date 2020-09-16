@@ -5,6 +5,8 @@ from math import asinh, tanh, cosh
 from SPMe_Baseline_Params import SPMe_Baseline_Parameters
 
 
+# Added Content to Test Branching
+
 class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
     def __init__(self, custom_params=None, timestep=1, sim_time=3600, voltage_limiter=True):
 
@@ -491,8 +493,6 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
             # print(docv_dCse_n[k])
 
             if done:
-                val_len = k
-
                 break
 
             if V_term[k] <= 2.75 and trim_results is True:
@@ -729,11 +729,11 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
 
 if __name__ == "__main__":
 
-    SPMe = SingleParticleModelElectrolyte_w_Sensitivity(sim_time=3600,)
+    SPMe = SingleParticleModelElectrolyte_w_Sensitivity(sim_time=1300,)
 
-    [xn, xp, xe, yn, yp, yep, theta_n, theta_p, docv_dCse_n, docv_dCse_p, V_term,
-     time, current, soc, dV_dDsn, dV_dDsp, dCse_dDsn, dCse_dDsp, dV_dEpsi_sn, dV_dEpsi_sp]\
-        = SPMe.sim(CC=True, zero_init_I=True, I_input=[25.67], init_SOC=1, plot_results=True)
+    # [xn, xp, xe, yn, yp, yep, theta_n, theta_p, docv_dCse_n, docv_dCse_p, V_term,
+    #  time, current, soc, dV_dDsn, dV_dDsp, dCse_dDsn, dCse_dDsp, dV_dEpsi_sn, dV_dEpsi_sp]\
+    #     = SPMe.sim(CC=True, zero_init_I=True, I_input=[-25.67*3], init_SOC=0, plot_results=True)
 
 
 

@@ -12,10 +12,13 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
     def __init__(self, time_step=1, SOC=.5):
         super(SingleParticleModelElectrolyte_w_Sensitivity).__init__()
 
+        # print("INIT CALLED")
+
         self.max_sen = 0
         self.C_se = None
 
         self.time_step = time_step
+        self.step_counter = 0
         self.SPMe = SingleParticleModelElectrolyte_w_Sensitivity(timestep=self.time_step)
 
         state_limits = np.array([np.inf, np.inf], dtype=np.float32)
@@ -96,9 +99,17 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         # err_msg = "%r (%s) invalid" % (action, type(action))
         # assert self.action_space.contains(action), err_msg
 
+        if self.step_counter == 0:
+            self.sim_state = self.SPMe.full_init_state
+            self.step_counter += 1
+        else: 
+            self.step_counter += 1
+
+        # [bat_states, new_sen_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse, done_flag] \
+        #     = self.SPMe.step(full_sim=True, states=self.sim_state, I_input=action, state_of_charge=self.state_of_charge)
 
         [bat_states, new_sen_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse, done_flag] \
-            = self.SPMe.step(full_sim=True, states=self.sim_state, I_input=action, state_of_charge=self.state_of_charge)
+            = self.SPMe.step(full_sim=True, states=self.sim_state, I_input=action)
 
         self.sim_state = [bat_states, new_sen_states]
         self.state_output = outputs
@@ -106,7 +117,7 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         self.epsi_sp = sensitivity_outputs['dV_dEpsi_sp']
         self.term_volt = V_term
 
-        print(self.epsi_sp.item())
+        # print(self.epsi_sp.item())
 
         self.C_se = theta[1].item()
         self.state_of_charge = soc_new[1].item()
@@ -145,15 +156,20 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         return np.array(self.state), reward, done, {}
 
     def reset(self):
-
+        self.step_counter = 0
+        # print("RESET CALLED")
         self.state = None
-        self.sim_state = None
+
         # self.state_of_charge = np.random.uniform(low=.25, high=.98)
         self.state_of_charge = self.SOC_0
-        # print(self.state_of_charge)
+        self.SPMe.__init__(init_soc=self.state_of_charge)
+
+        self.sim_state = self.SPMe.full_init_state
+
+        # print(self.sim_state)
 
         [bat_states, new_sen_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse, done] = self.SPMe.step(
-            full_sim=True, states=self.sim_state, I_input=0, state_of_charge=self.state_of_charge)
+            full_sim=True, states=self.sim_state, I_input=0)
 
         self.sim_state = [bat_states, new_sen_states]
         self.state = self.unpack_states(bat_states, new_sen_states, outputs, sensitivity_outputs)
@@ -166,3 +182,8 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
    #
    # def close(self):
 
+if __name__ == '__main__':
+
+    gym = SPMenv()
+
+    gym.reset()
