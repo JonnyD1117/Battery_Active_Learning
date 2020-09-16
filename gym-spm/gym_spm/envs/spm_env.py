@@ -15,8 +15,6 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         # print("INIT CALLED")
 
         self.max_sen = 0
-        self.C_se = None
-
         self.time_step = time_step
         self.step_counter = 0
         self.SPMe = SingleParticleModelElectrolyte_w_Sensitivity(timestep=self.time_step)
@@ -46,6 +44,11 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         self.np_random = None
         self.state_output = None
         self.re = None
+
+        self.C_se0 = None
+        self.C_se1 = None
+        self.epsi_sp = None
+        # self.dCse_dEpsi = None
 
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -117,10 +120,11 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         self.epsi_sp = sensitivity_outputs['dV_dEpsi_sp']
         self.term_volt = V_term
 
-        # print(self.epsi_sp.item())
 
-        self.C_se = theta[1].item()
+        self.C_se0 = theta[0].item()
+        self.C_se1 = theta[1].item()
         self.state_of_charge = soc_new[1].item()
+
         # self.state = [bat_states, new_sen_states]
 
         done = bool(self.state_of_charge < self.min_soc

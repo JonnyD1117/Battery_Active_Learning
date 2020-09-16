@@ -30,8 +30,11 @@ class TensorboardCallback(BaseCallback):
         value = np.random.random()
         self.logger.record('random_value', value)
         self.logger.record('train/SOC', env.state_of_charge)
-        self.logger.record('train/C_se', env.C_se)
         self.logger.record('train/Reward', env.re)
+        self.logger.record('train/Concentration_1', env.C_se0)
+        self.logger.record('train/Concentration_2', env.C_se1)
+        self.logger.record('train/Sensitivity (Epsi_sp)', env.epsi_sp.item())
+        # self.logger.record('train/Sensitivity (dCse_dEpsi)', env.dCse_dEpsi)
         
         # print(self.model)
         return True
