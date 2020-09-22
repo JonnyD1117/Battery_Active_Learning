@@ -27,14 +27,18 @@ class TensorboardCallback(BaseCallback):
 
     def _on_step(self) -> bool:
         # Log scalar value (here a random variable)
-        value = np.random.random()
-        self.logger.record('random_value', value)
-        self.logger.record('train/SOC', env.state_of_charge)
+
+        # Training Variables to Log
         self.logger.record('train/Reward', env.re)
-        self.logger.record('train/Concentration_1', env.C_se0)
-        self.logger.record('train/Concentration_2', env.C_se1)
-        self.logger.record('train/Sensitivity (Epsi_sp)', env.epsi_sp.item())
-        # self.logger.record('train/Sensitivity (dCse_dEpsi)', env.dCse_dEpsi)
+
+        # Battery Variables to Log
+        self.logger.record('battery/SOC', env.state_of_charge)
+        self.logger.record('battery/Concentration_1', env.C_se0)
+        self.logger.record('battery/Concentration_2', env.C_se1)
+        self.logger.record('battery/Sensitivity (Epsi_sp)', env.epsi_sp.item())
+        self.logger.record('battery/InputCurrent (Amps)', env.input_current)
+        self.logger.record('battery/Terminal Voltage (Volts)', env.term_volt)
+        # self.logger.record('battery/Sensitivity (dCse_dEpsi)', env.dCse_dEpsi)
         
         # print(self.model)
         return True

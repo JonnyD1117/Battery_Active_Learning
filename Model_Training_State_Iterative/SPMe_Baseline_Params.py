@@ -74,3 +74,13 @@ class SPMe_Baseline_Parameters:
     kappa_eff = kappa * (epsi_e ** 1.5)
     kappa_eff_sep = kappa * (epsi_sep ** 1.5)
 
+
+if __name__ == "__main__":
+
+
+    obj = SPMe_Baseline_Parameters()
+
+    print('cs_max_n', obj.cs_max_n)
+    print('cs_max_p', obj.cs_max_p)
+
+

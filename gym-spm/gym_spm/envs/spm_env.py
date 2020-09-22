@@ -5,7 +5,7 @@ from gym.utils import seeding
 import numpy as np
 
 
-class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
+class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity ):
 
     # metadata = {'render.modes': ['human']}
 
@@ -13,6 +13,8 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         super(SingleParticleModelElectrolyte_w_Sensitivity).__init__()
 
         # print("INIT CALLED")
+        self.cs_max_n = (3.6e3 * 372 * 1800) / 96487
+        self.cs_max_p = (3.6e3 * 274 * 5010) /  96487
 
         self.max_sen = 0
         self.time_step = time_step
@@ -49,6 +51,8 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         self.C_se1 = None
         self.epsi_sp = None
         # self.dCse_dEpsi = None
+        self.input_current = None
+        self.term_volt = None
 
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -102,6 +106,8 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         # err_msg = "%r (%s) invalid" % (action, type(action))
         # assert self.action_space.contains(action), err_msg
 
+        self.input_current = action.item()
+
         if self.step_counter == 0:
             self.sim_state = self.SPMe.full_init_state
             self.step_counter += 1
@@ -118,17 +124,24 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         self.state_output = outputs
         self.state = self.unpack_states(bat_states, new_sen_states, outputs, sensitivity_outputs)
         self.epsi_sp = sensitivity_outputs['dV_dEpsi_sp']
-        self.term_volt = V_term
-
+        self.term_volt = V_term.item()
+        
+        concentration_pos = self.state_output['yp'] 
+        concentration_neg = self.state_output['yn'] 
 
         self.C_se0 = theta[0].item()
         self.C_se1 = theta[1].item()
         self.state_of_charge = soc_new[1].item()
 
-        # self.state = [bat_states, new_sen_states]
+        # done = bool(self.state_of_charge < self.min_soc
+        #             or self.state_of_charge > self.max_soc
+        #             or np.isnan(V_term)
+        #             or done_flag is True)
 
-        done = bool(self.state_of_charge < self.min_soc
-                    or self.state_of_charge > self.max_soc
+        done = bool(concentration_neg > self.cs_max_n
+                    or concentration_pos > self.cs_max_p
+                    or concentration_neg < 0
+                    or concentration_pos < 0
                     or np.isnan(V_term)
                     or done_flag is True)
 
