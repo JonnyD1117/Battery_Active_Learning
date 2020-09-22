@@ -30,6 +30,7 @@ class TensorboardCallback(BaseCallback):
 
         # Training Variables to Log
         self.logger.record('train/Reward', env.re)
+        self.logger.record('train/Mean Reward', env.reward_mean)
 
         # Battery Variables to Log
         self.logger.record('battery/SOC', env.state_of_charge)
