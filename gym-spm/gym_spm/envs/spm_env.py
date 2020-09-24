@@ -150,13 +150,15 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         #     # self.reset()
 
         if not done:
-            reward = self.reward_function(self.epsi_sp.item(), action)
+            # reward = self.reward_function(self.epsi_sp.item(), action)
+            reward = self.reward_function(self.sensitivity_list, action)
+
             self.re = reward
 
         elif self.steps_beyond_done is None:
             # Pole just fell!
             self.steps_beyond_done = 0
-            reward = self.reward_function(self.epsi_sp.item(), action)
+            reward = self.reward_function(self.sensitivity_list, action)
             self.re = reward
 
         else:
