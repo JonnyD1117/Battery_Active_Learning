@@ -48,6 +48,7 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         self.C_se0 = None
         self.C_se1 = None
         self.epsi_sp = None
+        self.sensitivity_list = []
         # self.dCse_dEpsi = None
 
     def seed(self, seed=None):
@@ -79,9 +80,19 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
 
         return [yp.item(), dV_dEpsi_sp.item()]
 
-    def reward_function(self, sensitivity_value, action):
+    def reward_function(self, sensitivity_list, action):
 
-        reward = sensitivity_value**2
+        running_sqr_sum = 0.0
+        for i in range(len(sensitivity_list)):
+
+            running_sqr_sum += sensitivity_list[i]**2
+
+
+        # reward = sensitivity_value**2
+
+        reward = running_sqr_sum
+        
+
         # if action >= 25.67*3 or action <= -25.67*3:
         #     action_penalty = -100
         # else:
@@ -120,6 +131,7 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         self.epsi_sp = sensitivity_outputs['dV_dEpsi_sp']
         self.term_volt = V_term
 
+        self.sensitivity_list.append(self.epsi_sp.item())
 
         self.C_se0 = theta[0].item()
         self.C_se1 = theta[1].item()
