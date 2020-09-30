@@ -51,6 +51,9 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
         self.sensitivity_list = []
         # self.dCse_dEpsi = None
 
+        self.reward_list = []
+        self.reward_mean = 0.0
+
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
@@ -171,12 +174,18 @@ class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity):
 
             self.steps_beyond_done += 1
             reward = 0.0
+
+        self.reward_list.append(reward)
+        self.reward_mean = np.mean(self.reward_list)
+
         return np.array(self.state), reward, done, {}
 
     def reset(self):
         self.step_counter = 0
         # print("RESET CALLED")
         self.state = None
+        self.sensitivity_list = []
+
 
         # self.state_of_charge = np.random.uniform(low=.25, high=.98)
         self.state_of_charge = self.SOC_0
