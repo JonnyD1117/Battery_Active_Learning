@@ -50,6 +50,8 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
         self.full_init_state = [self.initial_state, self.initial_sen_state]
         self.next_full_state = [self.initial_state, self.initial_sen_state]
 
+        self.INIT_States = self.full_init_state
+
         # Simulation Settings
         self.dt = timestep
         self.simulation_time = sim_time
@@ -521,7 +523,7 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
 
         return [xn, xp, xe, yn, yp, yep, theta_n, theta_p, docv_dCse_n, docv_dCse_p, V_term, time, input_cur_prof, soc_list, dV_dDsn, dV_dDsp, dCse_dDsn, dCse_dDsp, dV_dEpsi_sn, dV_dEpsi_sp]
 
-    def step(self, states=None, I_input=None, full_sim=False):
+    def SPMe_step(self, states=None, I_input=None, full_sim=False):
         """
         step function runs one iteration of the model given the input current and returns output states and quantities
         States: dict(), I_input: scalar, state_of_charge: scalar
