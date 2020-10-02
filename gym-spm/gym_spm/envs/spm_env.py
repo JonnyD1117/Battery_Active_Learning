@@ -20,7 +20,7 @@ class SPMenv(gym.Env):
         self.global_counter = 0
         self.episode_counter = 0
 
-        self.writer = SummaryWriter('Logs/DDPG/Trial3')
+        self.writer = SummaryWriter('Logs/DDPG/Trial6')
         self.soc_list = []
 
         # print("INIT CALLED")
@@ -226,7 +226,7 @@ class SPMenv(gym.Env):
 
         # self.state_of_charge = np.random.uniform(low=.25, high=.98)
         self.state_of_charge = self.SOC_0
-        self.SPMe.__init__(init_soc=self.state_of_charge)
+        self.SPMe.__init__(init_soc=self.SOC_0)
 
         self.sim_state = self.SPMe.full_init_state
 

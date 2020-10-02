@@ -696,14 +696,16 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
             print("#################################################################################")
             print("Vel", vel)
 
-        if soc_new[1] < .07 or soc_new[0] < .005 or soc_new[1] > 1 or soc_new[0] > 1 or np.isnan(V_term) is True:
-            done_flag = True
+        # if soc_new[1] < .07 or soc_new[0] < .005 or soc_new[1] > 1 or soc_new[0] > 1 or np.isnan(V_term) is True:
+        #     done_flag = True
+        #
+        #     return [init_bat_states, sensitivity_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse, done_flag]
+        #
+        # else:
+        #
+        #     return [bat_states, new_sen_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse, done_flag]
 
-            return [init_bat_states, sensitivity_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse, done_flag]
-
-        else:
-
-            return [bat_states, new_sen_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse, done_flag]
+        return [bat_states, new_sen_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse, done_flag]
 
 
 if __name__ == "__main__":
