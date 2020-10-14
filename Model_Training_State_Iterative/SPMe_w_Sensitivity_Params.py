@@ -489,14 +489,14 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
             else:
                 input_current = input_current
             # Perform one iteration of simulation using "step" method
-            bat_states, sen_states, outputs, sen_outputs, soc_new, V_out, theta, docv_dCse, done = self.step(input_state, input_current[k], full_sim=True)
+            bat_states, sen_states, outputs, sen_outputs, soc_new, V_out, theta, docv_dCse, done = self.SPMe_step(input_state, input_current[k], full_sim=True)
 
             # Record Desired values for post-simulation plotting/analysis
             xn[:, [k]], xp[:, [k]], xe[:, [k]] = bat_states["xn"], bat_states["xp"], bat_states["xe"]
             yn[[k]], yp[[k]], yep[:, [k]] = outputs["yn"], outputs["yp"], outputs["yep"]
             theta_n[k], theta_p[k], docv_dCse_n[k], docv_dCse_p[k] = theta[0].item(), theta[1].item(), docv_dCse[0], docv_dCse[1]
 
-            V_term[k], time[k], input_cur_prof[k], soc_list[k] = V_out.item(), self.dt * k, input_current[k], soc_new[0].item()
+            V_term[k], time[k], input_cur_prof[k], soc_list[k] = V_out.item(), self.dt * k, input_current[k], soc_new[1].item()
 
             dV_dDsn[k], dV_dDsp[k], dCse_dDsn[k], dCse_dDsp[k], dV_dEpsi_sn[k], dV_dEpsi_sp[k] = sen_outputs["dV_dDsn"], sen_outputs["dV_dDsp"], sen_outputs["dCse_dDsn"], sen_outputs["dCse_dDsp"], sen_outputs["dV_dEpsi_sn"], sen_outputs["dV_dEpsi_sp"]
 
@@ -581,8 +581,8 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
         if full_sim is True:
             I = I_input
 
-            if I == 0:
-                I = .000000001
+            # if I == 0:
+            #     I = .000000001
         else:
             # Initialize Input Current
             if I_input is None:
@@ -710,11 +710,19 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
 
 if __name__ == "__main__":
 
-    SPMe = SingleParticleModelElectrolyte_w_Sensitivity(sim_time=3600, init_soc=1)
+    SPMe = SingleParticleModelElectrolyte_w_Sensitivity(sim_time=1300, init_soc=0)
 
     [xn, xp, xe, yn, yp, yep, theta_n, theta_p, docv_dCse_n, docv_dCse_p, V_term,
      time, current, soc, dV_dDsn, dV_dDsp, dCse_dDsn, dCse_dDsp, dV_dEpsi_sn, dV_dEpsi_sp]\
-        = SPMe.sim(CC=True, zero_init_I=False, I_input=[25.67], plot_results=True)
+        = SPMe.sim(CC=True, zero_init_I=False, I_input=[-25.67*3], plot_results=False)
+
+
+
+
+    print(f" Minimum SOC={np.min(soc)} : Maximum SOC={np.max(soc)}")
+
+    print(f"Electrode #1  Concentration Minimum={np.min(theta_n)} : Maximum={np.max(theta_n)}")
+    print(f"Electrode #2  Concentration Minimum={np.min(theta_p)} : Maximum={np.max(theta_p)}")
 
 
 

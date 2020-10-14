@@ -18,6 +18,7 @@ from stable_baselines3.td3.policies import MlpPolicy
 from stable_baselines3.common.noise import NormalActionNoise
 
 
+
 class TensorboardCallback(BaseCallback):
     """
     Custom callback for plotting additional values in tensorboard.
@@ -66,14 +67,16 @@ if __name__ == '__main__':
 
     # Instantiate Model
     n_actions = env.action_space.shape[-1]
-    action_noise = NormalActionNoise(mean=np.zeros(n_actions), sigma=0.1 * np.ones(n_actions))
-    model = DDPG('MlpPolicy', env, action_noise=action_noise, verbose=1, tensorboard_log=log_dir)
+    action_noise = NormalActionNoise(mean=np.zeros(n_actions), sigma=.75 * np.ones(n_actions))
+    # model = DDPG('MlpPolicy', env, action_noise=action_noise, verbose=1, tensorboard_log=log_dir)
+    model = DDPG('MlpPolicy', env, action_noise=action_noise, verbose=1)
+
     # model = PPO('MlpPolicy', env, tensorboard_log=log_dir)
 
     # Train OR Load Model
     if train_model:
-        model.learn(total_timesteps=25000, tb_log_name=details, callback=TensorboardCallback(env), log_interval=1,)
-        # model.learn(total_timesteps=25000, tb_log_name=details)
+        # model.learn(total_timesteps=2500000, tb_log_name=details, callback=TensorboardCallback(env), log_interval=1,)
+        model.learn(total_timesteps=200000, tb_log_name=details)
 
         # model.save(model_dir_description)
     else:

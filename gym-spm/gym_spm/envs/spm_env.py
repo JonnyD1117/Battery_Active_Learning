@@ -20,7 +20,9 @@ class SPMenv(gym.Env):
         self.global_counter = 0
         self.episode_counter = 0
 
-        self.writer = SummaryWriter('Logs/DDPG/Trial6')
+        # self.writer = SummaryWriter('Logs/DDPG/Trial6')
+
+        self.writer = SummaryWriter('Temp_Logs/Noise_Test_point5_SOC/DDPG_Noise2_Len_25k_mu_Neg30_std_point75')
         self.soc_list = []
 
         # print("INIT CALLED")
@@ -66,10 +68,19 @@ class SPMenv(gym.Env):
         # self.tb_dCse_dEpsi = None
         self.tb_input_current = None
         self.tb_state_of_charge = SOC
+        self.tb_state_of_charge_1 = SOC
         self.tb_term_volt = None
         self.tb_reward_list = []
         self.tb_reward_mean = None
         self.tb_instantaneous_reward = None
+
+        self.rec_epsi_sp = []
+        self.rec_input_current = []
+        self.rec_state_of_charge = []
+        self.rec_term_volt = []
+        self.rec_time = []
+
+        self.time = 0
 
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -163,7 +174,7 @@ class SPMenv(gym.Env):
                     or np.isnan(V_term)
                     or done_flag is True)
 
-     # done = bool(self.state_of_charge < self.min_soc
+        # done = bool(self.state_of_charge < self.min_soc
         #             or self.state_of_charge > self.max_soc
         #             or np.isnan(V_term)
         #             or done_flag is True)
@@ -198,6 +209,8 @@ class SPMenv(gym.Env):
         self.tb_C_se1 = theta[1].item()
         self.tb_epsi_sp = self.epsi_sp
         self.tb_state_of_charge = soc_new[1].item()
+        self.tb_state_of_charge_1 = soc_new[0].item()
+
         self.tb_term_volt = self.term_volt
         self.tb_input_current = self.input_current
         self.tb_instantaneous_reward = reward
@@ -208,11 +221,25 @@ class SPMenv(gym.Env):
         self.writer.add_scalar('Battery/C_se1', self.tb_C_se1,self.global_counter)
         self.writer.add_scalar('Battery/Epsi_sp', self.tb_epsi_sp,self.global_counter)
         self.writer.add_scalar('Battery/SOC', self.tb_state_of_charge,self.global_counter)
+        self.writer.add_scalar('Battery/SOC_1', self.tb_state_of_charge_1,self.global_counter)
+
         self.writer.add_scalar('Battery/Term_Voltage', self.tb_term_volt,self.global_counter)
         self.writer.add_scalar('Battery/Input_Current', self.tb_input_current,self.global_counter)
         self.writer.add_scalar('Battery/Instant Reward', self.tb_instantaneous_reward,self.global_counter)
         self.writer.add_scalar('Battery/Cum. Reward', self.tb_reward_mean, self.global_counter)
         self.writer.add_scalar('Battery/Num. Episodes', self.episode_counter, self.global_counter)
+
+        self.rec_epsi_sp.append(self.tb_epsi_sp.item())
+        self.rec_input_current.append(self.tb_input_current)
+        self.rec_state_of_charge.append(self.tb_state_of_charge)
+        self.rec_term_volt.append(self.tb_term_volt)
+        self.rec_time.append(self.time)
+
+        self.time += .2
+
+
+
+
 
 
         self.global_counter += 1
