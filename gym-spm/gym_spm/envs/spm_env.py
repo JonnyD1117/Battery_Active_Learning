@@ -177,7 +177,7 @@ class SPMenv(gym.Env):
         concentration_pos = self.state_output['yp'] 
         concentration_neg = self.state_output['yn']
 
-        done = bool(self.time_horizon_counter > self.training_duration
+        done = bool(self.time_horizon_counter >= self.training_duration
                     or np.isnan(V_term)
                     or done_flag is True)
 
