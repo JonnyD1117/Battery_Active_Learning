@@ -7,7 +7,6 @@ import numpy as np
 from torch.utils.tensorboard import SummaryWriter
 
 
-
 class SPMenv(gym.Env):
 
     # metadata = {'render.modes': ['human']}
@@ -17,6 +16,8 @@ class SPMenv(gym.Env):
 
         self.global_counter = 0
         self.episode_counter = 0
+        self.time_horizon_counter = 0
+        self.training_duration = training_duration
 
         self.log_state = log_data
 
@@ -27,7 +28,7 @@ class SPMenv(gym.Env):
 
         # print("INIT CALLED")
         self.cs_max_n = (3.6e3 * 372 * 1800) / 96487
-        self.cs_max_p = (3.6e3 * 274 * 5010) /  96487
+        self.cs_max_p = (3.6e3 * 274 * 5010) / 96487
 
         self.max_sen = 0
         self.time_step = time_step
@@ -111,6 +112,10 @@ class SPMenv(gym.Env):
 
         return [yp.item(), dV_dEpsi_sp.item()]
 
+    def get_time(self):
+        total_time = self.time_step*self.time_horizon_counter
+        return total_time
+
     def reward_function(self, sensitivity_value, action):
 
         reward = sensitivity_value**2
@@ -143,18 +148,15 @@ class SPMenv(gym.Env):
         else:
             self.step_counter += 1
 
-
         # Compute New Battery & Sensivitiy States
         [bat_states, new_sen_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse, done_flag] \
             = self.SPMe.SPMe_step(full_sim=True, states=self.sim_state_before, I_input=action)
 
+        # If Terminal Voltage Limits are hit, maintain the current state
         if V_term > self.max_term_voltage or V_term < self.min_term_voltage:
-            # States Do not Update if the max or min Voltage has been reached
 
-            pass
-        else:
-            pass
-
+            [bat_states, new_sen_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse,
+             done] = self.SPMe.SPMe_step(full_sim=True, states=self.sim_state_before, I_input=0)
 
         self.soc_list.append(soc_new[1].item())
 
@@ -173,18 +175,21 @@ class SPMenv(gym.Env):
         concentration_pos = self.state_output['yp'] 
         concentration_neg = self.state_output['yn']
 
-        done = bool(concentration_neg > self.cs_max_n
-                    or concentration_pos > self.cs_max_p
-                    or concentration_neg < 0
-                    or concentration_pos < 0
+        done = bool(self.time_horizon_counter > self.training_duration
                     or np.isnan(V_term)
                     or done_flag is True)
+
+        # done = bool(concentration_neg > self.cs_max_n
+        #             or concentration_pos > self.cs_max_p
+        #             or concentration_neg < 0
+        #             or concentration_pos < 0
+        #             or np.isnan(V_term)
+        #             or done_flag is True)
 
         # done = bool(self.state_of_charge < self.min_soc
         #             or self.state_of_charge > self.max_soc
         #             or np.isnan(V_term)
         #             or done_flag is True)
-
 
         if not done:
             reward = self.reward_function(self.epsi_sp.item(), action)
@@ -237,18 +242,15 @@ class SPMenv(gym.Env):
         self.rec_term_volt.append(self.tb_term_volt)
         self.rec_time.append(self.time)
 
-        self.time += .2
+        self.time += self.time_step
 
-
-
-
-
-
+        self.time_horizon_counter += 1
         self.global_counter += 1
         return np.array(self.state), reward, done, {}
 
     def reset(self):
         self.step_counter = 0
+        self.time_horizon_counter = 0
         self.episode_counter += 1
         # print("RESET CALLED")
         self.state = None
