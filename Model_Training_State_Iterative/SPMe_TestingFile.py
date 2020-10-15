@@ -49,6 +49,9 @@ if __name__ == '__main__':
     # Instantiate Environment
     env_id = 'gym_spm:spm-v0'
     env = gym.make('gym_spm:spm-v0')
+     
+    # env.log_data = True
+    # env.__init__()
 
     # HyperParameters
     lr = 3e-4

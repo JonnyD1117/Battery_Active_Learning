@@ -11,7 +11,7 @@ class SPMenv(gym.Env):
 
     # metadata = {'render.modes': ['human']}
 
-    def __init__(self, time_step=1, training_duration=1800, log_data=False, SOC=.5):
+    def __init__(self, time_step=1, training_duration=1800, log_data=True, SOC=.5):
         # super(SingleParticleModelElectrolyte_w_Sensitivity).__init__()
 
         self.global_counter = 0
@@ -23,7 +23,9 @@ class SPMenv(gym.Env):
 
         if self.log_state is True:
             # self.writer = SummaryWriter('Logs/DDPG/Trial6')
-            self.writer = SummaryWriter('Temp_Logs/Noise_Test_point5_SOC/DDPG_Noise2_Len_25k_mu_Neg30_std_point75')
+            # self.writer = SummaryWriter('Temp_Logs/Noise_Test_point5_SOC/DDPG_Noise2_Len_25k_mu_Neg30_std_point75')
+            self.writer = SummaryWriter('C:/Users/Indy-Windows/Documents/Battery_Active_Learning/Model_Training_State_Iterative/Temp_Logs/TimeTerm_point5_SOC/DDPG_Noise1_Len_25k_mu_0_std_point75')
+
         self.soc_list = []
 
         # print("INIT CALLED")
