@@ -8,21 +8,21 @@ from torch.utils.tensorboard import SummaryWriter
 
 
 
-# class SPMenv(gym.Env, SingleParticleModelElectrolyte_w_Sensitivity ):
 class SPMenv(gym.Env):
 
     # metadata = {'render.modes': ['human']}
 
-    def __init__(self, time_step=1, SOC=.5):
-        # super(SingleParticleModelElectrolyte_w_Sensitivity).__init__()
+    def __init__(self, time_step=1, training_duration=1800, log_data=False, SOC=.5):
         # super(SingleParticleModelElectrolyte_w_Sensitivity).__init__()
 
         self.global_counter = 0
         self.episode_counter = 0
 
-        # self.writer = SummaryWriter('Logs/DDPG/Trial6')
+        self.log_state = log_data
 
-        self.writer = SummaryWriter('Temp_Logs/Noise_Test_point5_SOC/DDPG_Noise2_Len_25k_mu_Neg30_std_point75')
+        if self.log_state is True:
+            # self.writer = SummaryWriter('Logs/DDPG/Trial6')
+            self.writer = SummaryWriter('Temp_Logs/Noise_Test_point5_SOC/DDPG_Noise2_Len_25k_mu_Neg30_std_point75')
         self.soc_list = []
 
         # print("INIT CALLED")
@@ -45,8 +45,8 @@ class SPMenv(gym.Env):
 
         self.min_soc = .04
         self.max_soc = 1.
-        self.min_voltage = 2.74
-        self.max_voltage = 4.1
+        self.min_term_voltage = 2.74
+        self.max_term_voltage = 4.1
 
         self.action_space = spaces.Box(-max_C_val, max_C_val, dtype=np.float32)
         self.observation_space = spaces.Box(-state_limits, state_limits, dtype=np.float32)
@@ -148,9 +148,15 @@ class SPMenv(gym.Env):
         [bat_states, new_sen_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse, done_flag] \
             = self.SPMe.SPMe_step(full_sim=True, states=self.sim_state_before, I_input=action)
 
-        self.soc_list.append(soc_new[1].item())
+        if V_term > self.max_term_voltage or V_term < self.min_term_voltage:
+            # States Do not Update if the max or min Voltage has been reached
 
-        # print(soc_new)
+            pass
+        else:
+            pass
+
+
+        self.soc_list.append(soc_new[1].item())
 
         # Unpack System, Simulation, and Sensitivity States and Outputs
         self.sim_state_after = [bat_states, new_sen_states]
@@ -179,12 +185,6 @@ class SPMenv(gym.Env):
         #             or np.isnan(V_term)
         #             or done_flag is True)
 
-        # done = bool(concentration_neg > self.cs_max_n
-        #             or concentration_pos > self.cs_max_p
-        #             or concentration_neg < 0
-        #             or concentration_pos < 0
-        #             or np.isnan(V_term)
-        #             or done_flag is True)
 
         if not done:
             reward = self.reward_function(self.epsi_sp.item(), action)
@@ -217,17 +217,19 @@ class SPMenv(gym.Env):
         self.tb_reward_list.append(reward)
         self.tb_reward_mean = np.mean(self.tb_reward_list)
 
-        self.writer.add_scalar('Battery/C_se0', self.tb_C_se0, self.global_counter)
-        self.writer.add_scalar('Battery/C_se1', self.tb_C_se1,self.global_counter)
-        self.writer.add_scalar('Battery/Epsi_sp', self.tb_epsi_sp,self.global_counter)
-        self.writer.add_scalar('Battery/SOC', self.tb_state_of_charge,self.global_counter)
-        self.writer.add_scalar('Battery/SOC_1', self.tb_state_of_charge_1,self.global_counter)
+        if self.log_state is True:
 
-        self.writer.add_scalar('Battery/Term_Voltage', self.tb_term_volt,self.global_counter)
-        self.writer.add_scalar('Battery/Input_Current', self.tb_input_current,self.global_counter)
-        self.writer.add_scalar('Battery/Instant Reward', self.tb_instantaneous_reward,self.global_counter)
-        self.writer.add_scalar('Battery/Cum. Reward', self.tb_reward_mean, self.global_counter)
-        self.writer.add_scalar('Battery/Num. Episodes', self.episode_counter, self.global_counter)
+            self.writer.add_scalar('Battery/C_se0', self.tb_C_se0, self.global_counter)
+            self.writer.add_scalar('Battery/C_se1', self.tb_C_se1,self.global_counter)
+            self.writer.add_scalar('Battery/Epsi_sp', self.tb_epsi_sp,self.global_counter)
+            self.writer.add_scalar('Battery/SOC', self.tb_state_of_charge,self.global_counter)
+            self.writer.add_scalar('Battery/SOC_1', self.tb_state_of_charge_1,self.global_counter)
+
+            self.writer.add_scalar('Battery/Term_Voltage', self.tb_term_volt,self.global_counter)
+            self.writer.add_scalar('Battery/Input_Current', self.tb_input_current,self.global_counter)
+            self.writer.add_scalar('Battery/Instant Reward', self.tb_instantaneous_reward,self.global_counter)
+            self.writer.add_scalar('Battery/Cum. Reward', self.tb_reward_mean, self.global_counter)
+            self.writer.add_scalar('Battery/Num. Episodes', self.episode_counter, self.global_counter)
 
         self.rec_epsi_sp.append(self.tb_epsi_sp.item())
         self.rec_input_current.append(self.tb_input_current)
