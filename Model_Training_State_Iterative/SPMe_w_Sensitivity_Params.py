@@ -582,7 +582,8 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
             I = I_input
 
             if I == 0:
-                I = .000000001
+                # I = .000000001
+                I = 0.0
         else:
             # Initialize Input Current
             if I_input is None:

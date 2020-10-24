@@ -24,7 +24,7 @@ class SPMenv(gym.Env):
         if self.log_state is True:
             # self.writer = SummaryWriter('Logs/DDPG/Trial6')
             # self.writer = SummaryWriter('Temp_Logs/Noise_Test_point5_SOC/DDPG_Noise2_Len_25k_mu_Neg30_std_point75')
-            self.writer = SummaryWriter('C:/Users/Indy-Windows/Documents/Battery_Active_Learning/Model_Training_State_Iterative/Temp_Logs/TimeTerm_point5_SOC/DDPG_Noise1_Len_25k_mu_0_std_point75')
+            self.writer = SummaryWriter('./Temp_Logs/TimeTerm_point5_SOC/DDPG_Noise0_Len_25k_mu_0_std_point75')
 
         self.soc_list = []
 
@@ -85,6 +85,7 @@ class SPMenv(gym.Env):
 
         self.time = 0
 
+
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
@@ -121,19 +122,6 @@ class SPMenv(gym.Env):
     def reward_function(self, sensitivity_value, action):
 
         reward = sensitivity_value**2
-        # if action >= 25.67*3 or action <= -25.67*3:
-        #     action_penalty = -100
-        # else:
-        #     action_penalty = 0
-        #
-        # if np.abs(sensitivity_value) > self.max_sen:
-        #
-        #     sen_reward = 1
-        #     self.max_sen = sensitivity_value
-        # else:
-        #     sen_reward = 0
-        #
-        # reward = action_penalty + sen_reward
 
         return reward
 
@@ -180,18 +168,6 @@ class SPMenv(gym.Env):
         done = bool(self.time_horizon_counter >= self.training_duration
                     or np.isnan(V_term)
                     or done_flag is True)
-
-        # done = bool(concentration_neg > self.cs_max_n
-        #             or concentration_pos > self.cs_max_p
-        #             or concentration_neg < 0
-        #             or concentration_pos < 0
-        #             or np.isnan(V_term)
-        #             or done_flag is True)
-
-        # done = bool(self.state_of_charge < self.min_soc
-        #             or self.state_of_charge > self.max_soc
-        #             or np.isnan(V_term)
-        #             or done_flag is True)
 
         if not done:
             reward = self.reward_function(self.epsi_sp.item(), action)
@@ -272,11 +248,6 @@ class SPMenv(gym.Env):
 
         self.steps_beyond_done = None
         return np.array(self.state)
-
-
-   # def render(self, mode='human'):
-   #
-   # def close(self):
 
 if __name__ == '__main__':
 
