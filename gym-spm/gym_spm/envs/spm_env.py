@@ -24,7 +24,7 @@ class SPMenv(gym.Env):
         if self.log_state is True:
             # self.writer = SummaryWriter('Logs/DDPG/Trial6')
             # self.writer = SummaryWriter('Temp_Logs/Noise_Test_point5_SOC/DDPG_Noise2_Len_25k_mu_Neg30_std_point75')
-            self.writer = SummaryWriter('./Temp_Logs/TimeTerm_point5_SOC/Timed_Eps_1800_DDPG_Noise1_Len_25k_mu_0_std_point75')
+            self.writer = SummaryWriter('./Temp_Logs/TimeTerm_point5_SOC/Timed_Eps_1800_DDPG_Noise7_Len_100k_mu_0_std_point75')
 
         self.soc_list = []
 
