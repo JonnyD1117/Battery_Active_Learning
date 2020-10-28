@@ -24,7 +24,7 @@ class SPMenv(gym.Env):
         if self.log_state is True:
             # self.writer = SummaryWriter('Logs/DDPG/Trial6')
             # self.writer = SummaryWriter('Temp_Logs/Noise_Test_point5_SOC/DDPG_Noise2_Len_25k_mu_Neg30_std_point75')
-            self.writer = SummaryWriter('./Temp_Logs/TimeTerm_point5_SOC/DDPG_Noise0_Len_25k_mu_0_std_point75')
+            self.writer = SummaryWriter('./Temp_Logs/TimeTerm_point5_SOC/Timed_Eps_1800_DDPG_Noise1_Len_25k_mu_0_std_point75')
 
         self.soc_list = []
 
@@ -38,7 +38,7 @@ class SPMenv(gym.Env):
         self.SPMe = SingleParticleModelElectrolyte_w_Sensitivity(timestep=self.time_step, init_soc=SOC)
 
         state_limits = np.array([np.inf, np.inf], dtype=np.float32)
-        max_C_val = np.array([25.67*5], dtype=np.float32)
+        max_C_val = np.array([25.67*1], dtype=np.float32)
 
         self.SOC_0 = SOC
         self.state_of_charge = SOC

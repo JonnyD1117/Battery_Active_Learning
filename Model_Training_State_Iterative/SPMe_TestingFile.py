@@ -33,7 +33,7 @@ if __name__ == '__main__':
     model = DDPG('MlpPolicy', env, action_noise=action_noise, verbose=1)
 
     # Train OR Load Model
-    model.learn(total_timesteps=200000)
+    model.learn(total_timesteps=25000)
 
     # model.save(model_dir_description)
 
