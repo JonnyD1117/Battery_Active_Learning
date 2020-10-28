@@ -2,20 +2,9 @@ import gym
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Added this to the Time Based Simulation
-
 from stable_baselines3 import PPO, TD3, DDPG
-from stable_baselines3.common.vec_env.vec_check_nan import VecCheckNan
-from stable_baselines3.common.env_checker import check_env
-from stable_baselines3.common.cmd_util import make_vec_env
-# from stable_baselines3.common.utils import set_random_seed
-# from stable_baselines3.common.vec_env import DummyVecEnv
-from stable_baselines3.common.monitor import Monitor
-from stable_baselines3.common.callbacks import BaseCallback
-
 from stable_baselines3.common.evaluation import evaluate_policy
-from stable_baselines3.td3.policies import MlpPolicy
-
+from stable_baselines3.ddpg.policies import MlpPolicy
 from stable_baselines3.common.noise import NormalActionNoise
 
 
@@ -24,16 +13,13 @@ if __name__ == '__main__':
     env_id = 'gym_spm:spm-v0'
     env = gym.make('gym_spm:spm-v0')
 
-    # HyperParameters
-    lr = 3e-4
-
     # Instantiate Model
     n_actions = env.action_space.shape[-1]
     action_noise = NormalActionNoise(mean=np.zeros(n_actions), sigma=.75 * np.ones(n_actions))
-    model = DDPG('MlpPolicy', env, action_noise=action_noise, verbose=1)
+    model = DDPG(MlpPolicy, env, action_noise=action_noise, verbose=1)
 
     # Train OR Load Model
-    model.learn(total_timesteps=200000)
+    model.learn(total_timesteps=2000000)
 
     # model.save(model_dir_description)
 

@@ -582,8 +582,8 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
             I = I_input
 
             if I == 0:
-                # I = .000000001
-                I = 0.0
+                I = .000000001
+                # I = 0.0
         else:
             # Initialize Input Current
             if I_input is None:
@@ -597,7 +597,7 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
 
         if Jn == 0:
             print("Molar Current Density (Jn) is equal to zero. This causes 'division by zero' later")
-            print("I", I)
+            print("Input Current is = ", I)
 
         # Compute "current timestep" Concentration from "Battery States" via Output Eqn (Pos & Neg)
         yn_new = C_dn @ xn_old + D_dn * 0

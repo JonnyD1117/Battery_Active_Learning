@@ -17,18 +17,16 @@ class SPMenv(gym.Env):
         self.global_counter = 0
         self.episode_counter = 0
         self.time_horizon_counter = 0
-        self.training_duration = training_duration
+        self.training_duration = training_duration*time_step
 
         self.log_state = log_data
 
         if self.log_state is True:
-            # self.writer = SummaryWriter('Logs/DDPG/Trial6')
-            # self.writer = SummaryWriter('Temp_Logs/Noise_Test_point5_SOC/DDPG_Noise2_Len_25k_mu_Neg30_std_point75')
-            self.writer = SummaryWriter('./Temp_Logs/TimeTerm_point5_SOC/DDPG_Noise0_Len_25k_mu_0_std_point75')
+
+            self.writer = SummaryWriter('./Temp_Logs/TimeTerm_point5_SOC/Timed_Eps_1800_DDPG_Noise0_Len_25k_mu_0_std_point75')
 
         self.soc_list = []
 
-        # print("INIT CALLED")
         self.cs_max_n = (3.6e3 * 372 * 1800) / 96487
         self.cs_max_p = (3.6e3 * 274 * 5010) / 96487
 
@@ -38,7 +36,7 @@ class SPMenv(gym.Env):
         self.SPMe = SingleParticleModelElectrolyte_w_Sensitivity(timestep=self.time_step, init_soc=SOC)
 
         state_limits = np.array([np.inf, np.inf], dtype=np.float32)
-        max_C_val = np.array([25.67*5], dtype=np.float32)
+        max_C_val = np.array([25.67*1], dtype=np.float32)
 
         self.SOC_0 = SOC
         self.state_of_charge = SOC
@@ -51,8 +49,11 @@ class SPMenv(gym.Env):
         self.min_term_voltage = 2.74
         self.max_term_voltage = 4.1
 
-        self.action_space = spaces.Box(-max_C_val, max_C_val, dtype=np.float32)
+        # self.action_space = spaces.Box(-max_C_val, max_C_val, dtype=np.float32)
+        self.action_space = spaces.Discrete(3)
         self.observation_space = spaces.Box(-state_limits, state_limits, dtype=np.float32)
+
+        self.action_dict = {0:-25.67, 1:0, 2:25.67}
 
         self.seed()
         self.viewer = None
@@ -129,7 +130,7 @@ class SPMenv(gym.Env):
         # err_msg = "%r (%s) invalid" % (action, type(action))
         # assert self.action_space.contains(action), err_msg
 
-        self.input_current = action.item()
+        self.input_current = self.action_dict[action]
 
         if self.step_counter == 0:
             self.sim_state_before = self.SPMe.full_init_state
@@ -227,6 +228,7 @@ class SPMenv(gym.Env):
         return np.array(self.state), reward, done, {}
 
     def reset(self):
+
         self.step_counter = 0
         self.time_horizon_counter = 0
         self.episode_counter += 1
