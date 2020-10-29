@@ -23,8 +23,10 @@ class SPMenv(gym.Env):
 
         if self.log_state is True:
             # self.writer = SummaryWriter('Logs/DDPG/Trial6')
-            # self.writer = SummaryWriter('Temp_Logs/Noise_Test_point5_SOC/DDPG_Noise2_Len_25k_mu_Neg30_std_point75')
-            self.writer = SummaryWriter('./Temp_Logs/TimeTerm_point5_SOC/Timed_Eps_1800_DDPG_Noise1_Len_25k_mu_0_std_point75')
+            # self.writer = SummaryWriter('Temp_Logs/Noise_Test_point5_SOC/DDPG_Noise00_Len_25k_mu_Neg30_std_point75')
+            self.writer = SummaryWriter('./Temp_Logs/TimeTerm_point5_SOC/Timed_Eps_1800_DDPG_Noise00_Len_ 1Million_mu_0_std_point75')
+            # self.writer = SummaryWriter('./Temp_Logs/TimeTerm_Viol_Penalty_point5_SOC/Timed_Eps_1800_DDPG_Noise4_Len_1Million_mu_0_std_point75_5Climit')
+
 
         self.soc_list = []
 
@@ -119,9 +121,40 @@ class SPMenv(gym.Env):
         total_time = self.time_step*self.time_horizon_counter
         return total_time
 
-    def reward_function(self, sensitivity_value, action):
+    def reward_function(self, sensitivity_value, action, soc=None, v_term=None):
 
-        reward = sensitivity_value**2
+        R_pen_soc = 0
+        R_pen_vterm = 0
+        R_Term = 0
+
+        if soc < 0 or soc > 1:
+
+            if soc > 1:
+                error_soc = soc - 1
+
+            elif soc < 0:
+                error_soc = soc
+
+            # R_pen_soc = -100*np.abs(error_soc)
+            R_pen_soc = -10
+
+        elif v_term < self.min_term_voltage or v_term > self.max_term_voltage:
+
+            if v_term < self.min_term_voltage:
+                error_vterm = self.min_term_voltage - v_term
+
+            elif v_term > self.max_term_voltage:
+                error_vterm = v_term - self.max_term_voltage
+
+            # R_pen_vterm = -100*np.abs(error_vterm)
+            R_pen_vterm = -10
+
+        if self.time_horizon_counter >= 1800:
+            R_Term = 10
+
+
+
+        reward = sensitivity_value**2 + R_pen_vterm + R_pen_soc + R_Term
 
         return reward
 
@@ -170,11 +203,11 @@ class SPMenv(gym.Env):
                     or done_flag is True)
 
         if not done:
-            reward = self.reward_function(self.epsi_sp.item(), action)
+            reward = self.reward_function(self.epsi_sp.item(), action, soc=self.state_of_charge, v_term=self.term_volt)
 
         elif self.steps_beyond_done is None:
             self.steps_beyond_done = 0
-            reward = self.reward_function(self.epsi_sp.item(), action)
+            reward = self.reward_function(self.epsi_sp.item(), action, soc=self.state_of_charge, v_term=self.term_volt)
 
         else:
             if self.steps_beyond_done == 0:
