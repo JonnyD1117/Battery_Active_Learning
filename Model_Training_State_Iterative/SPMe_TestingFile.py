@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from stable_baselines3 import PPO, TD3, DDPG
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.ddpg.policies import MlpPolicy
+from stable_baselines3.ppo.policies import MlpPolicy
 from stable_baselines3.common.noise import NormalActionNoise
 
 
@@ -14,12 +15,14 @@ if __name__ == '__main__':
     env = gym.make('gym_spm:spm-v0')
 
     # Instantiate Model
-    n_actions = env.action_space.shape[-1]
-    action_noise = NormalActionNoise(mean=np.zeros(n_actions), sigma=.75 * np.ones(n_actions))
-    model = DDPG(MlpPolicy, env, action_noise=action_noise, verbose=1)
+    # n_actions = env.action_space.shape[-1]
+    # action_noise = NormalActionNoise(mean=np.zeros(n_actions), sigma=.75 * np.ones(n_actions))
+    # model = DDPG(MlpPolicy, env, action_noise=action_noise, verbose=1)
+    model = PPO(MlpPolicy, env, verbose=1)
+
 
     # Train OR Load Model
-    model.learn(total_timesteps=2000000)
+    model.learn(total_timesteps=1000000)
 
     # model.save(model_dir_description)
 

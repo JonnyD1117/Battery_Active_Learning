@@ -23,7 +23,9 @@ class SPMenv(gym.Env):
 
         if self.log_state is True:
 
-            self.writer = SummaryWriter('./Temp_Logs/TimeTerm_point5_SOC/Timed_Eps_1800_DDPG_Noise0_Len_25k_mu_0_std_point75')
+            # self.writer = SummaryWriter('./Temp_Logs/TimeTerm_point5_SOC/Timed_Eps_1800_DDPG_Noise0_Len_25k_mu_0_std_point75')
+            self.writer = SummaryWriter('./Temp_Logs/Discrete_time_1C_rate_limit/Timed_Eps_1800_PPO_Noise_2Len_1Million_mu_0_std_point75_No_voltage_limiting')
+
 
         self.soc_list = []
 
@@ -144,10 +146,10 @@ class SPMenv(gym.Env):
             = self.SPMe.SPMe_step(full_sim=True, states=self.sim_state_before, I_input=action)
 
         # If Terminal Voltage Limits are hit, maintain the current state
-        if V_term > self.max_term_voltage or V_term < self.min_term_voltage:
-
-            [bat_states, new_sen_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse,
-             done] = self.SPMe.SPMe_step(full_sim=True, states=self.sim_state_before, I_input=0)
+        # if V_term > self.max_term_voltage or V_term < self.min_term_voltage:
+        #
+        #     [bat_states, new_sen_states, outputs, sensitivity_outputs, soc_new, V_term, theta, docv_dCse,
+        #      done] = self.SPMe.SPMe_step(full_sim=True, states=self.sim_state_before, I_input=0)
 
         self.soc_list.append(soc_new[1].item())
 
