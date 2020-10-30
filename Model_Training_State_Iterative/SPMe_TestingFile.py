@@ -15,6 +15,7 @@ from stable_baselines3.common.callbacks import BaseCallback
 
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.td3.policies import MlpPolicy
+from stable_baselines3.ddpg.policies import MlpPolicy
 
 from stable_baselines3.common.noise import NormalActionNoise
 
@@ -30,7 +31,7 @@ if __name__ == '__main__':
     # Instantiate Model
     n_actions = env.action_space.shape[-1]
     action_noise = NormalActionNoise(mean=np.zeros(n_actions), sigma=.75 * np.ones(n_actions))
-    model = DDPG('MlpPolicy', env, action_noise=action_noise, verbose=1)
+    model = DDPG(MlpPolicy, env, action_noise=action_noise, verbose=1)
 
     # Train OR Load Model
     model.learn(total_timesteps=100000)
