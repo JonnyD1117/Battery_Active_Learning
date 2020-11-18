@@ -1,0 +1,11 @@
+<SPMenv<spm_morestates-v0>>
+Using cuda device
+Wrapping the env in a DummyVecEnv.
+Traceback (most recent call last):
+  File "C:/Users/Indy-Windows/Documents/Battery_Active_Learning/Model_Training_State_Iterative_MoreStates/SPMe_TestingFile.py", line 44, in <module>
+    wandb.watch(model)
+  File "C:\Users\Indy-Windows\AppData\Local\Programs\Python\Python38\lib\site-packages\wandb\sdk\wandb_watch.py", line 66, in watch
+    wandb.run.history.torch.add_log_hooks_to_pytorch_module(
+  File "C:\Users\Indy-Windows\AppData\Local\Programs\Python\Python38\lib\site-packages\wandb\wandb_torch.py", line 131, in add_log_hooks_to_pytorch_module
+    for name, parameter in module.named_parameters():
+AttributeError: 'DDPG' object has no attribute 'named_parameters'

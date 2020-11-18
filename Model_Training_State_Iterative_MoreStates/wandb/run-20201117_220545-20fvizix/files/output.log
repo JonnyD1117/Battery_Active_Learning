@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "C:/Users/Indy-Windows/Documents/Battery_Active_Learning/Model_Training_State_Iterative_MoreStates/SPMe_TestingFile.py", line 30, in <module>
+    wandb.log({"input_current": env.SPMenv.input_current})
+AttributeError: 'SPMenv' object has no attribute 'SPMenv'

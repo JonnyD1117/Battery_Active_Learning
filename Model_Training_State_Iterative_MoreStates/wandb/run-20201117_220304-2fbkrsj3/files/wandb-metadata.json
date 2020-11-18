@@ -1,0 +1,24 @@
+{
+    "os": "Windows-10-10.0.19041-SP0",
+    "python": "3.8.5",
+    "heartbeatAt": "2020-11-18T06:03:05.832158",
+    "startedAt": "2020-11-18T06:03:04.551190",
+    "docker": null,
+    "gpu": "GeForce GTX 1080 Ti",
+    "gpu_count": 1,
+    "cpu_count": 16,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "codePath": "Model_Training_State_Iterative_MoreStates\\SPMe_TestingFile.py",
+    "program": "C:/Users/Indy-Windows/Documents/Battery_Active_Learning/Model_Training_State_Iterative_MoreStates/SPMe_TestingFile.py",
+    "git": {
+        "remote": "git@github.com:JonnyD1117/Battery_Active_Learning.git",
+        "commit": "fabdff9a39bbc78229592b14cf9f91393c884711"
+    },
+    "email": "jonathandorsey1117@gmail.com",
+    "root": "C:/Users/Indy-Windows/Documents/Battery_Active_Learning",
+    "host": "IndyBox",
+    "username": "Indy-Windows",
+    "executable": "C:\\Users\\Indy-Windows\\AppData\\Local\\Programs\\Python\\Python38\\python.exe"
+}

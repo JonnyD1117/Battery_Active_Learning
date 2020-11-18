@@ -1,0 +1,103 @@
+2020-11-17 22:06:09,423 INFO    MainThread:17456 [internal.py:wandb_internal():63] W&B internal server running at pid: 17456
+2020-11-17 22:06:09,425 INFO    WriterThread:17456 [datastore.py:open_for_write():76] open: C:\Users\Indy-Windows\Documents\Battery_Active_Learning\Model_Training_State_Iterative_MoreStates\wandb\run-20201117_220608-tos3y7bl\run-tos3y7bl.wandb
+2020-11-17 22:06:09,425 DEBUG   HandlerThread:17456 [handler.py:handle_request():55] handle_request: check_version
+2020-11-17 22:06:09,426 DEBUG   SenderThread:17456 [sender.py:send():90] send: header
+2020-11-17 22:06:09,426 DEBUG   SenderThread:17456 [sender.py:send():90] send: request
+2020-11-17 22:06:09,430 DEBUG   SenderThread:17456 [sender.py:send_request():99] send_request: check_version
+2020-11-17 22:06:09,432 DEBUG   Thread-8  :17456 [connectionpool.py:_new_conn():939] Starting new HTTPS connection (1): pypi.org:443
+2020-11-17 22:06:09,546 DEBUG   Thread-8  :17456 [connectionpool.py:_make_request():433] https://pypi.org:443 "GET /pypi/wandb/json HTTP/1.1" 200 51661
+2020-11-17 22:06:09,583 DEBUG   SenderThread:17456 [sender.py:send():90] send: run
+2020-11-17 22:06:09,594 DEBUG   SenderThread:17456 [util.py:is_cygwin_git():315] Failed checking if running in CYGWIN due to: FileNotFoundError(2, 'The system cannot find the file specified', None, 2, None)
+2020-11-17 22:06:09,596 DEBUG   SenderThread:17456 [cmd.py:execute():718] Popen(['git', 'cat-file', '--batch-check'], cwd=C:\Users\Indy-Windows\Documents\Battery_Active_Learning, universal_newlines=False, shell=None, istream=<valid stream>)
+2020-11-17 22:06:09,628 DEBUG   SenderThread:17456 [connectionpool.py:_new_conn():939] Starting new HTTPS connection (1): api.wandb.ai:443
+2020-11-17 22:06:09,835 DEBUG   SenderThread:17456 [connectionpool.py:_make_request():433] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 None
+2020-11-17 22:06:09,869 DEBUG   HandlerThread:17456 [handler.py:handle_request():55] handle_request: run_start
+2020-11-17 22:06:09,871 INFO    SenderThread:17456 [dir_watcher.py:__init__():164] watching files in: C:\Users\Indy-Windows\Documents\Battery_Active_Learning\Model_Training_State_Iterative_MoreStates\wandb\run-20201117_220608-tos3y7bl\files
+2020-11-17 22:06:09,871 INFO    SenderThread:17456 [sender.py:_start_run_threads():487] run started: tos3y7bl with start time 1605679568
+2020-11-17 22:06:09,871 DEBUG   SenderThread:17456 [sender.py:send():90] send: summary
+2020-11-17 22:06:09,872 INFO    SenderThread:17456 [sender.py:_save_file():568] saving file wandb-summary.json with policy end
+2020-11-17 22:06:09,889 DEBUG   HandlerThread:17456 [cmd.py:execute():718] Popen(['git', 'cat-file', '--batch-check'], cwd=C:\Users\Indy-Windows\Documents\Battery_Active_Learning, universal_newlines=False, shell=None, istream=<valid stream>)
+2020-11-17 22:06:09,923 DEBUG   HandlerThread:17456 [cmd.py:execute():718] Popen(['git', 'rev-parse', '--show-toplevel'], cwd=C:\Users\Indy-Windows\Documents\Battery_Active_Learning, universal_newlines=False, shell=None, istream=None)
+2020-11-17 22:06:10,123 DEBUG   SenderThread:17456 [sender.py:send():90] send: files
+2020-11-17 22:06:10,123 DEBUG   HandlerThread:17456 [handler.py:handle_request():55] handle_request: status
+2020-11-17 22:06:10,123 INFO    SenderThread:17456 [sender.py:_save_file():568] saving file wandb-metadata.json with policy now
+2020-11-17 22:06:10,125 DEBUG   SenderThread:17456 [sender.py:send():90] send: request
+2020-11-17 22:06:10,125 DEBUG   SenderThread:17456 [sender.py:send_request():99] send_request: status
+2020-11-17 22:06:10,128 DEBUG   SenderThread:17456 [connectionpool.py:_new_conn():939] Starting new HTTPS connection (1): api.wandb.ai:443
+2020-11-17 22:06:10,139 DEBUG   Thread-17 :17456 [connectionpool.py:_new_conn():939] Starting new HTTPS connection (1): api.wandb.ai:443
+2020-11-17 22:06:10,277 DEBUG   SenderThread:17456 [connectionpool.py:_make_request():433] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 None
+2020-11-17 22:06:10,279 DEBUG   SenderThread:17456 [sender.py:send():90] send: history
+2020-11-17 22:06:10,280 DEBUG   SenderThread:17456 [sender.py:send():90] send: summary
+2020-11-17 22:06:10,280 INFO    SenderThread:17456 [sender.py:_save_file():568] saving file wandb-summary.json with policy end
+2020-11-17 22:06:10,303 DEBUG   Thread-17 :17456 [connectionpool.py:_make_request():433] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 None
+2020-11-17 22:06:10,308 DEBUG   Thread-17 :17456 [connectionpool.py:_new_conn():939] Starting new HTTPS connection (1): storage.googleapis.com:443
+2020-11-17 22:06:10,736 DEBUG   Thread-17 :17456 [connectionpool.py:_make_request():433] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/jdorsey22/BAL-RL/tos3y7bl/wandb-metadata.json?Expires=1605765971&GoogleAccessId=wandb-production%40appspot.gserviceaccount.com&Signature=TN1Q7MnfepcfWjimUk4nyOi65V7Brx7%2FiVVV390Zu4PCr0vq3n3OtTsrZSvmIhHHavi7Iuq3%2BGpJ5oE0W7%2F5BIeUf8YWrazIychbyAd%2BL80%2BqMgKrHbLKlEuZ9xpoTBQBXDy7jZJzClrMNAkdbW%2FCnQB6V2dQcjQMcYUPzjoprdV6HfjGNxRmpIULGNAi0eF%2F2fzIKoX5xx%2FIjQei1ycYDiR9NCaaVAXVJM65Ds7Jxzujf%2BWZndxgTGk0x6W5d7HppvuEp6a3uuMEQATiG8hPniG0JhL7ArUzXohL%2FrN8BQIi7setY5fl8ciH6WuimS5WuvwxHyxcJkk%2FXUIY68O%2BQ%3D%3D HTTP/1.1" 200 0
+2020-11-17 22:06:10,738 INFO    Thread-17 :17456 [upload_job.py:push():131] Uploaded file C:\Users\INDY-W~1\AppData\Local\Temp\tmp3a2z6h29wandb\2m07uv5j-wandb-metadata.json
+2020-11-17 22:06:10,880 INFO    Thread-12 :17456 [dir_watcher.py:_on_file_created():212] file/dir created: C:\Users\Indy-Windows\Documents\Battery_Active_Learning\Model_Training_State_Iterative_MoreStates\wandb\run-20201117_220608-tos3y7bl\files\output.log
+2020-11-17 22:06:10,881 INFO    Thread-12 :17456 [dir_watcher.py:_on_file_created():212] file/dir created: C:\Users\Indy-Windows\Documents\Battery_Active_Learning\Model_Training_State_Iterative_MoreStates\wandb\run-20201117_220608-tos3y7bl\files\requirements.txt
+2020-11-17 22:06:10,881 INFO    Thread-12 :17456 [dir_watcher.py:_on_file_created():212] file/dir created: C:\Users\Indy-Windows\Documents\Battery_Active_Learning\Model_Training_State_Iterative_MoreStates\wandb\run-20201117_220608-tos3y7bl\files\wandb-summary.json
+2020-11-17 22:06:10,881 INFO    Thread-12 :17456 [dir_watcher.py:_on_file_created():212] file/dir created: C:\Users\Indy-Windows\Documents\Battery_Active_Learning\Model_Training_State_Iterative_MoreStates\wandb\run-20201117_220608-tos3y7bl\files\wandb-metadata.json
+2020-11-17 22:06:11,886 INFO    Thread-12 :17456 [dir_watcher.py:_on_file_modified():225] file/dir modified: C:\Users\Indy-Windows\Documents\Battery_Active_Learning\Model_Training_State_Iterative_MoreStates\wandb\run-20201117_220608-tos3y7bl\files\output.log
+2020-11-17 22:06:13,111 DEBUG   Thread-9  :17456 [connectionpool.py:_new_conn():939] Starting new HTTPS connection (1): api.wandb.ai:443
+2020-11-17 22:06:13,318 DEBUG   Thread-9  :17456 [connectionpool.py:_make_request():433] https://api.wandb.ai:443 "POST /files/jdorsey22/BAL-RL/tos3y7bl/file_stream HTTP/1.1" 200 None
+2020-11-17 22:06:13,621 DEBUG   SenderThread:17456 [sender.py:send():90] send: stats
+2020-11-17 22:06:15,752 DEBUG   Thread-9  :17456 [connectionpool.py:_make_request():433] https://api.wandb.ai:443 "POST /files/jdorsey22/BAL-RL/tos3y7bl/file_stream HTTP/1.1" 200 None
+2020-11-17 22:06:18,561 DEBUG   SenderThread:17456 [sender.py:send():90] send: stats
+2020-11-17 22:06:18,673 DEBUG   Thread-9  :17456 [connectionpool.py:_make_request():433] https://api.wandb.ai:443 "POST /files/jdorsey22/BAL-RL/tos3y7bl/file_stream HTTP/1.1" 200 None
+2020-11-17 22:06:23,502 DEBUG   SenderThread:17456 [sender.py:send():90] send: stats
+2020-11-17 22:06:23,608 DEBUG   Thread-9  :17456 [connectionpool.py:_make_request():433] https://api.wandb.ai:443 "POST /files/jdorsey22/BAL-RL/tos3y7bl/file_stream HTTP/1.1" 200 None
+2020-11-17 22:06:24,984 INFO    Thread-12 :17456 [dir_watcher.py:_on_file_modified():225] file/dir modified: C:\Users\Indy-Windows\Documents\Battery_Active_Learning\Model_Training_State_Iterative_MoreStates\wandb\run-20201117_220608-tos3y7bl\files\output.log
+2020-11-17 22:06:25,294 DEBUG   HandlerThread:17456 [handler.py:handle_request():55] handle_request: status
+2020-11-17 22:06:25,294 DEBUG   SenderThread:17456 [sender.py:send():90] send: request
+2020-11-17 22:06:25,294 DEBUG   SenderThread:17456 [sender.py:send_request():99] send_request: status
+2020-11-17 22:06:25,296 DEBUG   SenderThread:17456 [connectionpool.py:_new_conn():939] Starting new HTTPS connection (1): api.wandb.ai:443
+2020-11-17 22:06:25,518 DEBUG   SenderThread:17456 [connectionpool.py:_make_request():433] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 None
+2020-11-17 22:06:26,852 DEBUG   Thread-9  :17456 [connectionpool.py:_make_request():433] https://api.wandb.ai:443 "POST /files/jdorsey22/BAL-RL/tos3y7bl/file_stream HTTP/1.1" 200 None
+2020-11-17 22:06:28,429 DEBUG   SenderThread:17456 [sender.py:send():90] send: stats
+2020-11-17 22:06:30,566 DEBUG   Thread-9  :17456 [connectionpool.py:_make_request():433] https://api.wandb.ai:443 "POST /files/jdorsey22/BAL-RL/tos3y7bl/file_stream HTTP/1.1" 200 None
+2020-11-17 22:06:33,355 DEBUG   SenderThread:17456 [sender.py:send():90] send: stats
+2020-11-17 22:06:33,463 DEBUG   Thread-9  :17456 [connectionpool.py:_make_request():433] https://api.wandb.ai:443 "POST /files/jdorsey22/BAL-RL/tos3y7bl/file_stream HTTP/1.1" 200 None
+2020-11-17 22:06:38,284 DEBUG   SenderThread:17456 [sender.py:send():90] send: stats
+2020-11-17 22:06:38,409 DEBUG   Thread-9  :17456 [connectionpool.py:_make_request():433] https://api.wandb.ai:443 "POST /files/jdorsey22/BAL-RL/tos3y7bl/file_stream HTTP/1.1" 200 None
+2020-11-17 22:06:40,096 INFO    Thread-12 :17456 [dir_watcher.py:_on_file_modified():225] file/dir modified: C:\Users\Indy-Windows\Documents\Battery_Active_Learning\Model_Training_State_Iterative_MoreStates\wandb\run-20201117_220608-tos3y7bl\files\output.log
+2020-11-17 22:06:40,530 DEBUG   HandlerThread:17456 [handler.py:handle_request():55] handle_request: status
+2020-11-17 22:06:40,530 DEBUG   SenderThread:17456 [sender.py:send():90] send: request
+2020-11-17 22:06:40,531 DEBUG   SenderThread:17456 [sender.py:send_request():99] send_request: status
+2020-11-17 22:06:40,532 DEBUG   SenderThread:17456 [connectionpool.py:_new_conn():939] Starting new HTTPS connection (1): api.wandb.ai:443
+2020-11-17 22:06:40,721 DEBUG   SenderThread:17456 [connectionpool.py:_make_request():433] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 None
+2020-11-17 22:06:41,669 DEBUG   Thread-9  :17456 [connectionpool.py:_make_request():433] https://api.wandb.ai:443 "POST /files/jdorsey22/BAL-RL/tos3y7bl/file_stream HTTP/1.1" 200 None
+2020-11-17 22:06:43,214 DEBUG   SenderThread:17456 [sender.py:send():90] send: stats
+2020-11-17 22:06:45,356 DEBUG   Thread-9  :17456 [connectionpool.py:_make_request():433] https://api.wandb.ai:443 "POST /files/jdorsey22/BAL-RL/tos3y7bl/file_stream HTTP/1.1" 200 None
+2020-11-17 22:06:48,140 DEBUG   SenderThread:17456 [sender.py:send():90] send: stats
+2020-11-17 22:06:48,263 DEBUG   Thread-9  :17456 [connectionpool.py:_make_request():433] https://api.wandb.ai:443 "POST /files/jdorsey22/BAL-RL/tos3y7bl/file_stream HTTP/1.1" 200 None
+2020-11-17 22:06:53,068 DEBUG   SenderThread:17456 [sender.py:send():90] send: stats
+2020-11-17 22:06:53,186 DEBUG   Thread-9  :17456 [connectionpool.py:_make_request():433] https://api.wandb.ai:443 "POST /files/jdorsey22/BAL-RL/tos3y7bl/file_stream HTTP/1.1" 200 None
+2020-11-17 22:06:55,735 DEBUG   HandlerThread:17456 [handler.py:handle_request():55] handle_request: status
+2020-11-17 22:06:55,735 DEBUG   SenderThread:17456 [sender.py:send():90] send: request
+2020-11-17 22:06:55,735 DEBUG   SenderThread:17456 [sender.py:send_request():99] send_request: status
+2020-11-17 22:06:55,737 DEBUG   SenderThread:17456 [connectionpool.py:_new_conn():939] Starting new HTTPS connection (1): api.wandb.ai:443
+2020-11-17 22:06:55,801 DEBUG   Thread-9  :17456 [connectionpool.py:_make_request():433] https://api.wandb.ai:443 "POST /files/jdorsey22/BAL-RL/tos3y7bl/file_stream HTTP/1.1" 200 None
+2020-11-17 22:06:55,986 DEBUG   SenderThread:17456 [connectionpool.py:_make_request():433] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 None
+2020-11-17 22:06:56,216 INFO    Thread-12 :17456 [dir_watcher.py:_on_file_modified():225] file/dir modified: C:\Users\Indy-Windows\Documents\Battery_Active_Learning\Model_Training_State_Iterative_MoreStates\wandb\run-20201117_220608-tos3y7bl\files\output.log
+2020-11-17 22:06:57,956 DEBUG   Thread-9  :17456 [connectionpool.py:_make_request():433] https://api.wandb.ai:443 "POST /files/jdorsey22/BAL-RL/tos3y7bl/file_stream HTTP/1.1" 200 None
+2020-11-17 22:06:57,999 DEBUG   SenderThread:17456 [sender.py:send():90] send: stats
+2020-11-17 22:07:00,198 DEBUG   Thread-9  :17456 [connectionpool.py:_make_request():433] https://api.wandb.ai:443 "POST /files/jdorsey22/BAL-RL/tos3y7bl/file_stream HTTP/1.1" 200 None
+2020-11-17 22:07:02,926 DEBUG   SenderThread:17456 [sender.py:send():90] send: stats
+2020-11-17 22:07:03,043 DEBUG   Thread-9  :17456 [connectionpool.py:_make_request():433] https://api.wandb.ai:443 "POST /files/jdorsey22/BAL-RL/tos3y7bl/file_stream HTTP/1.1" 200 None
+2020-11-17 22:07:07,858 DEBUG   SenderThread:17456 [sender.py:send():90] send: stats
+2020-11-17 22:07:07,985 DEBUG   Thread-9  :17456 [connectionpool.py:_make_request():433] https://api.wandb.ai:443 "POST /files/jdorsey22/BAL-RL/tos3y7bl/file_stream HTTP/1.1" 200 None
+2020-11-17 22:07:11,003 DEBUG   HandlerThread:17456 [handler.py:handle_request():55] handle_request: status
+2020-11-17 22:07:11,003 DEBUG   SenderThread:17456 [sender.py:send():90] send: request
+2020-11-17 22:07:11,003 DEBUG   SenderThread:17456 [sender.py:send_request():99] send_request: status
+2020-11-17 22:07:11,005 DEBUG   SenderThread:17456 [connectionpool.py:_new_conn():939] Starting new HTTPS connection (1): api.wandb.ai:443
+2020-11-17 22:07:11,181 DEBUG   SenderThread:17456 [connectionpool.py:_make_request():433] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 None
+2020-11-17 22:07:12,784 DEBUG   SenderThread:17456 [sender.py:send():90] send: stats
+2020-11-17 22:07:14,351 INFO    Thread-12 :17456 [dir_watcher.py:_on_file_modified():225] file/dir modified: C:\Users\Indy-Windows\Documents\Battery_Active_Learning\Model_Training_State_Iterative_MoreStates\wandb\run-20201117_220608-tos3y7bl\files\output.log
+2020-11-17 22:07:17,716 DEBUG   SenderThread:17456 [sender.py:send():90] send: stats
+2020-11-17 22:07:22,648 DEBUG   SenderThread:17456 [sender.py:send():90] send: stats
+2020-11-17 22:07:22,763 DEBUG   Thread-9  :17456 [connectionpool.py:_make_request():433] https://api.wandb.ai:443 "POST /files/jdorsey22/BAL-RL/tos3y7bl/file_stream HTTP/1.1" 200 None
+2020-11-17 22:07:26,193 DEBUG   HandlerThread:17456 [handler.py:handle_request():55] handle_request: status
+2020-11-17 22:07:26,193 DEBUG   SenderThread:17456 [sender.py:send():90] send: request
+2020-11-17 22:07:26,193 DEBUG   SenderThread:17456 [sender.py:send_request():99] send_request: status
+2020-11-17 22:07:26,195 DEBUG   SenderThread:17456 [connectionpool.py:_new_conn():939] Starting new HTTPS connection (1): api.wandb.ai:443
+2020-11-17 22:07:26,408 DEBUG   SenderThread:17456 [connectionpool.py:_make_request():433] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 None

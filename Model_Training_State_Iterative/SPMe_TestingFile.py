@@ -17,7 +17,7 @@ from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.td3.policies import MlpPolicy
 from stable_baselines3.ddpg.policies import MlpPolicy
 
-from stable_baselines3.common.noise import NormalActionNoise
+from stable_baselines3.common.noise import NormalActionNoise, OrnsteinUhlenbeckActionNoise
 
 
 if __name__ == '__main__':
@@ -28,15 +28,20 @@ if __name__ == '__main__':
     # HyperParameters
     lr = 3e-4
 
+    model_name = "DDGP_2.pt"
+    model_path = "./Model/" + model_name
+
     # Instantiate Model
     n_actions = env.action_space.shape[-1]
-    action_noise = NormalActionNoise(mean=np.zeros(n_actions), sigma=.75 * np.ones(n_actions))
-    model = DDPG(MlpPolicy, env, action_noise=action_noise, verbose=1)
+    action_noise = NormalActionNoise(mean=np.zeros(n_actions), sigma=.75 * np.ones(n_actions),)
+    model = DDPG(MlpPolicy, env, action_noise=action_noise, verbose=1,)
+
+    print(model)
 
     # Train OR Load Model
-    model.learn(total_timesteps=100000)
+    model.learn(total_timesteps=250000)
 
-    # model.save(model_dir_description)
+    # model.save(model_path)
 
     mean_reward, std_reward = evaluate_policy(model, model.get_env(), n_eval_episodes=10)
 

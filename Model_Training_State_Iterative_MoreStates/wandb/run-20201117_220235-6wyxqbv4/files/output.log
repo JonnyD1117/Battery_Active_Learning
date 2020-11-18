@@ -1,0 +1,25 @@
+<SPMenv<spm_morestates-v0>>
+Using cuda device
+Wrapping the env in a DummyVecEnv.
+Molar Current Density (Jn) is equal to zero. This causes 'division by zero' later
+I 0.0
+Molar Current Density (Jn) is equal to zero. This causes 'division by zero' later
+I 0.0
+Traceback (most recent call last):
+  File "C:/Users/Indy-Windows/Documents/Battery_Active_Learning/Model_Training_State_Iterative_MoreStates/SPMe_TestingFile.py", line 49, in <module>
+    model.learn(total_timesteps=25000)
+  File "C:\Users\Indy-Windows\AppData\Local\Programs\Python\Python38\lib\site-packages\stable_baselines3\ddpg\ddpg.py", line 126, in learn
+    return super(DDPG, self).learn(
+  File "C:\Users\Indy-Windows\AppData\Local\Programs\Python\Python38\lib\site-packages\stable_baselines3\td3\td3.py", line 189, in learn
+    return super(TD3, self).learn(
+  File "C:\Users\Indy-Windows\AppData\Local\Programs\Python\Python38\lib\site-packages\stable_baselines3\common\off_policy_algorithm.py", line 245, in learn
+    rollout = self.collect_rollouts(
+  File "C:\Users\Indy-Windows\AppData\Local\Programs\Python\Python38\lib\site-packages\stable_baselines3\common\off_policy_algorithm.py", line 403, in collect_rollouts
+    new_obs, reward, done, infos = env.step(action)
+  File "C:\Users\Indy-Windows\AppData\Local\Programs\Python\Python38\lib\site-packages\stable_baselines3\common\vec_env\base_vec_env.py", line 161, in step
+    return self.step_wait()
+  File "C:\Users\Indy-Windows\AppData\Local\Programs\Python\Python38\lib\site-packages\stable_baselines3\common\vec_env\dummy_vec_env.py", line 41, in step_wait
+    obs, self.buf_rews[env_idx], self.buf_dones[env_idx], self.buf_infos[env_idx] = self.envs[env_idx].step(
+  File "c:\users\indy-windows\documents\battery_active_learning\gym-spm-morestates\gym_spm_morestates\envs\spm_env_morestates.py", line 252, in step
+    wandb.log({"Battery State of Charge": self.tb_state_of_charge})
+NameError: name 'wandb' is not defined
