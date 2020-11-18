@@ -2,10 +2,11 @@ import gym
 import numpy as np
 import matplotlib.pyplot as plt
 
-from stable_baselines3 import PPO, TD3, DDPG
+from stable_baselines3 import PPO, TD3, DDPG, DQN
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.ddpg.policies import MlpPolicy
 from stable_baselines3.ppo.policies import MlpPolicy
+from stable_baselines3.dqn.policies import MlpPolicy
 from stable_baselines3.common.noise import NormalActionNoise
 
 
@@ -18,17 +19,22 @@ if __name__ == '__main__':
     # n_actions = env.action_space.shape[-1]
     # action_noise = NormalActionNoise(mean=np.zeros(n_actions), sigma=.75 * np.ones(n_actions))
     # model = DDPG(MlpPolicy, env, action_noise=action_noise, verbose=1)
-    model = PPO(MlpPolicy, env, verbose=1)
+    model = DQN(MlpPolicy, env, verbose=1)
 
+    print(model)
 
     # Train OR Load Model
-    model.learn(total_timesteps=1000000)
+    # model.learn(total_timesteps=50000)
+    #
+    # model.save("./Models/DQN_50K")
 
-    # model.save(model_dir_description)
+    model = DQN.load("./Models/DQN_50K")
 
-    mean_reward, std_reward = evaluate_policy(model, model.get_env(), n_eval_episodes=10)
+    env.log_state = False
 
-    print("Mean Reward = ", mean_reward)
+    # mean_reward, std_reward = evaluate_policy(model, model.get_env(), n_eval_episodes=10)
+
+    # print("Mean Reward = ", mean_reward)
 
 
     print(env.soc_list)
@@ -38,11 +44,16 @@ if __name__ == '__main__':
     soc_list = []
     Concentration_list = []
     Concentration_list1 = []
-
+    action_dict = {0: -25.67, 1: 0, 2: 25.67}
     obs = env.reset()
     for _ in range(3600):
 
         action, _states = model.predict(obs)
+        print(action)
+
+        if action.shape != [1] :
+            continue
+
         obs, rewards, done, info = env.step(action)
 
         epsi_sp_list.append(env.epsi_sp.item(0))

@@ -415,8 +415,15 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
         dCse_dDsp = -1 * out_Sdsp_p * self.param['Ds_p']
         dCse_dDsn = out_Sdsn_n * self.param['Ds_n']
 
+        # Surface Concentration Sensitivity for Epsilon (pos & neg)
+        dCse_dEpsi_sp = -1. * out_Sepsi_p * self.param['epsi_n']
+        dCse_dEpsi_sn = out_Sepsi_n * self.param[
+            'epsi_n']  # Espi_N and Epsi_p have the same value, Epsi_p currently not defined
+
         new_sen_states = {"Sepsi_p": Sepsi_p_new, "Sepsi_n": Sepsi_n_new, "Sdsp_p": Sdsp_p_new, "Sdsn_n": Sdsn_n_new}
-        new_sen_outputs = {"dV_dDsn": dV_dDsn, "dV_dDsp": dV_dDsp, "dCse_dDsn": dCse_dDsn, "dCse_dDsp": dCse_dDsp, "dV_dEpsi_sn": dV_dEpsi_sn, "dV_dEpsi_sp": dV_dEpsi_sp}
+        new_sen_outputs = {"dV_dDsn": dV_dDsn, "dV_dDsp": dV_dDsp, "dCse_dDsn": dCse_dDsn, "dCse_dDsp": dCse_dDsp,
+                           "dV_dEpsi_sn": dV_dEpsi_sn, "dV_dEpsi_sp": dV_dEpsi_sp, 'dCse_dEpsi_sp': dCse_dEpsi_sp,
+                           'dCse_dEpsi_sn': dCse_dEpsi_sn}
 
         return [new_sen_states, new_sen_outputs]
 
