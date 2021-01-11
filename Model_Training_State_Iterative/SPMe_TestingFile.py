@@ -39,7 +39,7 @@ if __name__ == '__main__':
     print(model)
 
     # Train OR Load Model
-    model.learn(total_timesteps=250000)
+    model.learn(total_timesteps=25000)
 
     # model.save(model_path)
 

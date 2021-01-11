@@ -18,16 +18,17 @@ from stable_baselines3.td3.policies import MlpPolicy
 from stable_baselines3.ddpg.policies import MlpPolicy
 
 from stable_baselines3.common.noise import NormalActionNoise
+from spme_battery_gym_environment_module import SPMenv
+
+
+
 
 import wandb
 
 
 if __name__ == '__main__':
-    # Instantiate Environment
-    env_id = 'gym_spm_morestates:spm_morestates-v0'
-    env = gym.make('gym_spm_morestates:spm_morestates-v0')
 
-    print(env)
+    env = SPMenv()
 
     # HyperParameters
     lr = 3e-4
@@ -38,7 +39,9 @@ if __name__ == '__main__':
     # Instantiate Model
     n_actions = env.action_space.shape[-1]
     action_noise = NormalActionNoise(mean=np.zeros(n_actions), sigma=.75 * np.ones(n_actions))
-    model = DDPG(MlpPolicy, env, action_noise=action_noise, verbose=1, train_freq=25000, n_episodes_rollout=-1)
+    # model = DDPG(MlpPolicy, env, action_noise=action_noise, verbose=1, train_freq=25000, n_episodes_rollout=-1)
+    model = DDPG(MlpPolicy, env, action_noise=action_noise, verbose=1, train_freq=-1, n_episodes_rollout=1, buffer_size=10000)
+
     # model = DDPG(MlpPolicy, env, verbose=1, train_freq=2500, n_episodes_rollout=-1)
 
     # wandb.watch(model)
@@ -48,14 +51,14 @@ if __name__ == '__main__':
     model.learn(total_timesteps=25000)
     env.log_state = False
 
-    model.save(model_path)
+    # model.save(model_path)
+    #
+    # mean_reward, std_reward = evaluate_policy(model, model.get_env(), n_eval_episodes=10)
+    #
+    # print("Mean Reward = ", mean_reward)
 
-    mean_reward, std_reward = evaluate_policy(model, model.get_env(), n_eval_episodes=10)
 
-    print("Mean Reward = ", mean_reward)
-
-
-    print(env.soc_list)
+    # print(env.soc_list)
 
     epsi_sp_list = []
     action_list = []

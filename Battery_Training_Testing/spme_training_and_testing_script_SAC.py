@@ -18,16 +18,17 @@ from stable_baselines3.td3.policies import MlpPolicy
 from stable_baselines3.ddpg.policies import MlpPolicy
 
 from stable_baselines3.common.noise import NormalActionNoise
+from spme_battery_gym_environment_module import SPMenv
+
+
+
 
 import wandb
 
 
 if __name__ == '__main__':
-    # Instantiate Environment
-    env_id = 'gym_spm_morestates:spm_morestates-v0'
-    env = gym.make('gym_spm_morestates:spm_morestates-v0')
 
-    print(env)
+    env = SPMenv()
 
     # HyperParameters
     lr = 3e-4

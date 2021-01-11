@@ -14,54 +14,38 @@ from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.callbacks import BaseCallback
 
 from stable_baselines3.common.evaluation import evaluate_policy
-from stable_baselines3.td3.policies import MlpPolicy
-from stable_baselines3.ddpg.policies import MlpPolicy
+# from stable_baselines3.td3.policies import MlpPolicy
+# from stable_baselines3.ddpg.policies import MlpPolicy
+from stable_baselines3.ppo.policies import MlpPolicy
 
 from stable_baselines3.common.noise import NormalActionNoise
-
-import wandb
+from integrator_env import SimpleSOC
 
 
 if __name__ == '__main__':
-    # Instantiate Environment
-    env_id = 'gym_spm_morestates:spm_morestates-v0'
-    env = gym.make('gym_spm_morestates:spm_morestates-v0')
 
-    print(env)
-
-    # HyperParameters
-    lr = 3e-4
-
-    model_name = "DDGP_2.pt"
-    model_path = "./Model/" + model_name
+    env = SimpleSOC()
 
     # Instantiate Model
     n_actions = env.action_space.shape[-1]
     action_noise = NormalActionNoise(mean=np.zeros(n_actions), sigma=.75 * np.ones(n_actions))
-    model = DDPG(MlpPolicy, env, action_noise=action_noise, verbose=1, train_freq=25000, n_episodes_rollout=-1)
-    # model = DDPG(MlpPolicy, env, verbose=1, train_freq=2500, n_episodes_rollout=-1)
+    # model = DDPG(MlpPolicy, env, action_noise=action_noise, verbose=1)
 
+    # model = DDPG(MlpPolicy, env, verbose=1, train_freq=-1, n_episodes_rollout=1, learning_starts=10000, batch_size=100)
+    model = PPO(MlpPolicy, env, verbose=1, use_sde=True)
+    # model.load("./model/ddpg_simp_integrators_n_eps_rollout_1_learning_starts_10k_batch_size_100_total_timesteps_200k")
     # wandb.watch(model)
 
-
     # Train OR Load Model
-    model.learn(total_timesteps=25000)
-    env.log_state = False
+    model.learn(total_timesteps=200000)
 
-    model.save(model_path)
-
-    mean_reward, std_reward = evaluate_policy(model, model.get_env(), n_eval_episodes=10)
-
-    print("Mean Reward = ", mean_reward)
+    model.save(f"./model/PPO_simp_integrators_trial2")
 
 
-    print(env.soc_list)
 
-    epsi_sp_list = []
-    action_list = []
     soc_list = []
-    Concentration_list = []
-    Concentration_list1 = []
+    action_list = []
+    done = False
 
     obs = env.reset()
     for _ in range(3600):
@@ -69,23 +53,26 @@ if __name__ == '__main__':
         action, _states = model.predict(obs)
         obs, rewards, done, info = env.step(action)
 
-        epsi_sp_list.append(env.epsi_sp.item(0))
-        soc_list.append(env.state_of_charge)
+        soc_list.append(obs.item())
         action_list.append(action)
 
         if done:
             break
-            # obs = env.reset()
 
     plt.figure()
     plt.plot(soc_list)
-    plt.show()
-
-    plt.figure()
-    plt.plot(epsi_sp_list)
-    plt.title("Sensitivity Values")
+    plt.title("State of Charge")
 
     plt.figure()
     plt.plot(action_list)
     plt.title("Input Currents")
     plt.show()
+
+
+
+
+
+
+
+
+
