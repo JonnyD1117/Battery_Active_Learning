@@ -103,6 +103,7 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
         a_n0 = (self.param['epsi_n'] ** (3 / 2) + 4 * self.param['epsi_sep'] ** (3 / 2)) / (80000 * self.param['De'] * self.param['epsi_n'] ** (3 / 2) * self.param['epsi_sep'] ** (3 / 2))
         b_n0 = (self.param['epsi_n'] ** 2 * self.param['epsi_sep'] + 24 * self.param['epsi_n'] ** 3 + 320 * self.param['epsi_sep'] ** 3 + 160 * self.param['epsi_n'] ** (3 / 2) * self.param['epsi_sep'] ** (3 / 2)) / (19200000000 * (4 * self.param['De_n'] * self.param['epsi_n'] ** (1 / 2) * self.param['epsi_sep'] ** 3 + self.param['De_n'] * self.param['epsi_n'] ** 2 * self.param['epsi_sep'] ** (3 / 2)))
 
+        # Electrolyte Concentation State Space Model
         self.Aep = np.array([[-1 / b_p0, 0], [0, -1 / b_n0]])
         self.Bep = self.param['gamak'] * np.array([[1], [1]])
         self.Cep = np.array([[a_p0 / b_p0, 0], [0, a_n0 / b_n0]])
@@ -355,6 +356,7 @@ class SingleParticleModelElectrolyte_w_Sensitivity(SPMe_Baseline_Parameters):
 
     def compute_Sensitivities(self, I, Jn, Jp, j0_n, j0_p, k_n, k_p, theta_n, theta_p, docvn_dCsen, docvp_dCsep, init_sen_state):
 
+        # Unpack Current Sensitivities
         Sepsi_p, Sepsi_n, Sdsp_p, Sdsn_n = init_sen_state["Sepsi_p"], init_sen_state["Sepsi_n"], init_sen_state["Sdsp_p"], init_sen_state["Sdsn_n"]
 
         theta_p = theta_p*self.param['cs_max_p']
