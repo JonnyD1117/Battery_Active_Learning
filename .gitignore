@@ -3,5 +3,13 @@
 */Models/*
 
 */Temp_Logs/*
-*/log_files/*
+**/log_files
+**\tb_log
+*event.
+*.pt
 
+
+**/log_files
+**/__pycache__
+
+**.idea
