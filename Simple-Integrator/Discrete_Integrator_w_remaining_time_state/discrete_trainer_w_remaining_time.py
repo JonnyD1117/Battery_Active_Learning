@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from Discrete_Integrator.discrete_action_integrator_env import DiscreteSimpleSOC
+from Discrete_Integrator_w_remaining_time_state.discrete_action_integrator_w_remaining_time_env import DiscreteSimpleSOC
 
 
 from stable_baselines3 import DQN

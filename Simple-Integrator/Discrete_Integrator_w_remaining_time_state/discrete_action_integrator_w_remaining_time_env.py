@@ -17,6 +17,7 @@ class DiscreteSimpleSOC(gym.Env):
 
         self.training_duration = 1800
         # self.training_duration = 3600
+        self.remaining_time = self.training_duration
 
         self.time_horizon_counter = 0
         self.global_counter = 0
@@ -57,6 +58,7 @@ class DiscreteSimpleSOC(gym.Env):
         self.SOC = self.SOC_0 - (1./self.cap)*input_current*self.dt
         self.SOC_0 = self.SOC
 
+        self.remaining_time += self.dt
         # Max and Min SOC Constraints
         ##############################################
         ## Testing Penalty Based SOC limiting
@@ -103,7 +105,7 @@ class DiscreteSimpleSOC(gym.Env):
             self.writer.add_scalar('SimpleSOC/Avg. Reward', self.tb_reward_mean, self.global_counter)
             self.writer.add_scalar('SimpleSOC/Num. Episodes', self.episode_counter, self.global_counter)
 
-        self.state = [self.SOC]
+        self.state = [self.SOC, self.remaining_time]
         self.time_horizon_counter += 1
         self.global_counter += 1
 
@@ -117,6 +119,8 @@ class DiscreteSimpleSOC(gym.Env):
         self.SOC_0 = self.SOC_init
         # self.SOC_0 = random.uniform(1.2,-.2)
         # self.SOC_0 = random.uniform(1,0)
+
+        self.remaining_time = self.training_duration
 
         # self.state = np.array([random.uniform(1,0)])
 
