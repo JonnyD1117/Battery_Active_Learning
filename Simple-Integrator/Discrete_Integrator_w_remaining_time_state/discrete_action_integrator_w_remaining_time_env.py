@@ -23,13 +23,14 @@ class DiscreteSimpleSOC(gym.Env):
         self.global_counter = 0
         self.episode_counter = 0
         self.log_state = log_state
+        self.cumulative_reward = 0
 
         if self.log_state is True:
-            self.writer = SummaryWriter('./log_files/tb_log/Round1/Disc_REPEAT_1T3_5')
+            self.writer = SummaryWriter('./log_files/tb_log/Round1/Disc_REPEAT_w_time_remaining_1T1_1')
             # self.writer = SummaryWriter('./log_files/tb_log/Round1/Disc_NO_TRAINING_10')
 
 
-        state_limits = np.array([np.inf], dtype=np.float32)
+        state_limits = np.array([np.inf, np.inf], dtype=np.float32)
         action_limits = np.array([25.67*self.c_rate], dtype=np.float32)
 
         self.action_space = spaces.Discrete(3)
@@ -49,10 +50,9 @@ class DiscreteSimpleSOC(gym.Env):
         self.tb_reward_sum = None
         self.tb_instantaneous_reward = None
 
-
     def step(self, action):
-
         input_current = 25.67*self.action_dict[action.item()]
+        # input_current = 25.67*self.action_dict[action]
 
         # SOC Integrator Dynamics (NOTE: Negative Input Current -> Charging)
         self.SOC = self.SOC_0 - (1./self.cap)*input_current*self.dt
@@ -88,6 +88,7 @@ class DiscreteSimpleSOC(gym.Env):
 
             reward = 0.0
 
+        self.cumulative_reward += reward
         # Log TensorBoard Variables
         self.tb_input_current = input_current
         self.tb_state_of_charge = self.SOC
@@ -109,7 +110,7 @@ class DiscreteSimpleSOC(gym.Env):
         self.time_horizon_counter += 1
         self.global_counter += 1
 
-        return np.array(self.state), reward, done, {}
+        return np.array(self.state), reward, done, {"total_reward": self.cumulative_reward}
 
     def reset(self):
 
@@ -119,19 +120,23 @@ class DiscreteSimpleSOC(gym.Env):
         self.SOC_0 = self.SOC_init
         # self.SOC_0 = random.uniform(1.2,-.2)
         # self.SOC_0 = random.uniform(1,0)
+        self.cumulative_reward = 0
 
-        self.remaining_time = self.training_duration
+        self.remaining_time = 0
 
         # self.state = np.array([random.uniform(1,0)])
 
-        self.state = [self.SOC_0]
+        self.state = [self.SOC_0, self.remaining_time]
 
         return np.array(self.state)
 
+    def get_cumulative_reward(self):
+
+        return self.cumulative_reward
 
     def reward_function(self, reward_input):
 
-        min_reward_thres = .6
+        min_reward_thres = .55
         max_reward_thres = .85
 
         # penalty =0
