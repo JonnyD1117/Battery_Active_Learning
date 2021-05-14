@@ -8,7 +8,7 @@ import numpy as np
 
 class DiscreteSimpleSOC(gym.Env):
 
-    def __init__(self, log_state=True):
+    def __init__(self, log_state=False):
 
         # self.cap = 2500 # mAh
         self.cap = 25.670*3600  # Ah*3600 := Amp*seconds

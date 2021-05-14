@@ -34,7 +34,7 @@ class DiscreteSimpleSOC(gym.Env):
         self.cumulative_reward = 0
 
         if self.log_state is True:
-            self.writer = SummaryWriter(f'./log_files/REPEAT_w_time_remaining_1T{trial_num}')
+            self.writer = SummaryWriter(f'./log_files/Training_Time_Test_{trial_num}')
             # self.writer = SummaryWriter('./log_files/tb_log/Round1/Disc_NO_TRAINING_10')
 
         state_limits = np.array([np.inf, np.inf], dtype=np.float32)
@@ -52,34 +52,23 @@ class DiscreteSimpleSOC(gym.Env):
         # TensorBoard Logging
         self.tb_input_current = None
         self.tb_state_of_charge = self.SOC_0
-        self.tb_reward_list = []
-        self.tb_reward_mean = None
-        self.tb_reward_sum = None
+        # self.tb_reward_list = []
+        # self.tb_reward_mean = None
+        # self.tb_reward_sum = None
         self.tb_instantaneous_reward = None
+
+        self.tb_reward_mean = 0
+        self.tb_reward_mean_counter = 1
+        self.tb_reward_sum = 0
 
     def step(self, action):
         input_current = 25.67*self.action_dict[action.item()]
-        # input_current = 25.67*self.action_dict[action]
 
         # SOC Integrator Dynamics (NOTE: Negative Input Current -> Charging)
         self.SOC = self.SOC_0 - (1./self.cap)*input_current*self.dt
         self.SOC_0 = self.SOC
 
-        self.remaining_time += self.dt
-        # Max and Min SOC Constraints
-        ##############################################
-        ## Testing Penalty Based SOC limiting
-        ##############################################
-        # if self.SOC > 1.0:
-        #     self.SOC = 1.
-        #
-        # elif self.SOC < 0.0:
-        #     self.SOC = 0.
-        #
-        # else:
-        #     self.SOC = self.SOC
-        ###############################################
-        # Determine if the Episode has Reached it's termination Time
+        self.remaining_time -= self.dt
         done = bool(self.time_horizon_counter >= self.training_duration)
 
         if not done:
@@ -99,9 +88,14 @@ class DiscreteSimpleSOC(gym.Env):
         # Log TensorBoard Variables
         self.tb_input_current = input_current
         self.tb_state_of_charge = self.SOC
-        self.tb_reward_list.append(reward)
-        self.tb_reward_mean = np.mean(self.tb_reward_list)
-        self.tb_reward_sum = np.sum(self.tb_reward_list)
+
+        # self.tb_reward_list.append(reward)
+        # self.tb_reward_mean = np.mean(self.tb_reward_list)
+        # self.tb_reward_sum = np.sum(self.tb_reward_list)
+
+        self.tb_reward_mean = increment_mean(reward, self.tb_reward_mean, self.tb_reward_mean_counter)
+        self.tb_reward_mean_counter += 1
+        self.tb_reward_sum += reward
 
         self.tb_instantaneous_reward = reward
 
@@ -129,7 +123,7 @@ class DiscreteSimpleSOC(gym.Env):
         # self.SOC_0 = random.uniform(1,0)
         self.cumulative_reward = 0
 
-        self.remaining_time = 0
+        self.remaining_time = self.training_duration
 
         # self.state = np.array([random.uniform(1,0)])
 
@@ -165,24 +159,44 @@ class DiscreteSimpleSOC(gym.Env):
         return reward1
 
 
+def increment_mean(new_value, prev_mean, mean_counter):
+
+    if mean_counter == 0:
+        new_mean = prev_mean
+
+    else:
+        new_mean = prev_mean + ((new_value-prev_mean)/mean_counter)
+
+    return new_mean
+
+
+
 if __name__ == '__main__':
 
-    save_list = ["1_1", "1_2","1_3","1_4","1_5","2_1","2_2","2_3","2_4","2_5", "3_1","3_2","3_3","3_4","3_5" ]
+    save_list = ["1_1_1", "1_1_2", "1_1_3", "1_1_4", "1_1_5", "1_1_6", "1_1_7", "1_1_8", "1_1_9", "1_1_10",
+                 "1_2_1", "1_2_2", "1_2_3", "1_2_4", "1_2_5", "1_2_6", "1_2_7", "1_2_8", "1_2_9", "1_2_10",
+                 "1_3_1", "1_3_2", "1_3_3", "1_3_4", "1_3_5", "1_3_6", "1_3_7", "1_3_8", "1_3_9", "1_3_10",
+                 "1_4_1", "1_4_2", "1_4_3", "1_4_4", "1_4_5", "1_4_6", "1_4_7", "1_4_8", "1_4_9", "1_4_10",
+                 "1_5_1", "1_5_2", "1_5_3", "1_5_4", "1_5_5", "1_5_6", "1_5_7", "1_5_7", "1_5_9", "1_5_10"]
 
     for ind, trial_num in enumerate(save_list):
 
-        if ind<=4:
+        if ind <= 9:
             thres = .55
-        elif ind > 4 and ind <=9:
+        elif ind > 9 and ind <=19:
             thres = .6
-        else:
+        elif ind > 19 and ind <=29:
             thres = .65
+        elif ind > 29 and ind <= 39:
+            thres = .7
+        else:
+            thres = .75
 
         env = DiscreteSimpleSOC(threshold_value=thres, trial_num=trial_num)
         model = DQN(MlpPolicy, env, verbose=1)
-        model.learn(total_timesteps=750000)
+        model.learn(total_timesteps=500000)
 
-        model.save(f"./model/REPEAT_w_time_remaining_1T{trial_num}")
+        model.save(f"./model/Training_Time_Test_{trial_num}")
 
         action_value = {0:-25.67, 1:0, 2: 25.67}
 
@@ -194,43 +208,46 @@ if __name__ == '__main__':
         obs = env.reset()
         stoichastic=[True, False]
 
-        for stoich_val in stoichastic:
+        try:
+            for stoich_val in stoichastic:
 
-            for _ in range(3600):
+                for _ in range(3600):
 
-                action, _states = model.predict(obs, deterministic=stoich_val)
+                    action, _states = model.predict(obs, deterministic=stoich_val)
 
-                # print(f"action is {action}")
-                # print(f"_state is {_states}")
+                    # print(f"action is {action}")
+                    # print(f"_state is {_states}")
 
-                obs, rewards, done, info = env.step(action)
+                    obs, rewards, done, info = env.step(action)
 
-                # print(f"SOC STATE: {obs[0]} ")
-                # print(f"REMAINING STATE: {obs[1]} ")
+                    # print(f"SOC STATE: {obs[0]} ")
+                    # print(f"REMAINING STATE: {obs[1]} ")
 
-                aval = action_value[action.item()]
+                    aval = action_value[action.item()]
 
-                soc_list.append(obs[0])
-                remaining_time_list.append(obs[1])
-                action_list.append(aval)
+                    soc_list.append(obs[0])
+                    remaining_time_list.append(obs[1])
+                    action_list.append(aval)
 
-                if done:
-                    break
+                    if done:
+                        break
 
-            plt.figure()
-            plt.plot(soc_list)
-            plt.title(f"State of Charge: Trial Number: {trial_num} Stoichastic: {stoich_val}")
-            plt.savefig(f"./model/images/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_SOC.png")
-            np.save(f"./model/outputs/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_SOC", soc_list)
+                plt.figure()
+                plt.plot(soc_list)
+                plt.title(f"State of Charge: Trial Number: {trial_num} Stoichastic: {stoich_val}")
+                plt.savefig(f"./model/images/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_SOC.png")
+                np.save(f"./model/outputs/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_SOC", soc_list)
 
-            plt.figure()
-            plt.plot(remaining_time_list)
-            plt.title(f"Remaining Time: Trial Number: {trial_num} Stoichastic: {stoich_val}")
-            plt.savefig(f"./model/images/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_remaining_time.png")
-            np.save(f"./model/outputs/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_SOC", remaining_time_list)
+                plt.figure()
+                plt.plot(remaining_time_list)
+                plt.title(f"Remaining Time: Trial Number: {trial_num} Stoichastic: {stoich_val}")
+                plt.savefig(f"./model/images/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_remaining_time.png")
+                np.save(f"./model/outputs/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_SOC", remaining_time_list)
 
-            plt.figure()
-            plt.plot(action_list)
-            plt.title(f"Input Currents: Trial Number: {trial_num} Stoichastic: {stoich_val}")
-            plt.savefig(f"./model/images/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_input_current.png")
-            np.save(f"./model/outputs/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_SOC", action_list)
+                plt.figure()
+                plt.plot(action_list)
+                plt.title(f"Input Currents: Trial Number: {trial_num} Stoichastic: {stoich_val}")
+                plt.savefig(f"./model/images/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_input_current.png")
+                np.save(f"./model/outputs/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_SOC", action_list)
+        except ValueError:
+            print("Action produced 2 Actions ERROR (skipping model evluation")

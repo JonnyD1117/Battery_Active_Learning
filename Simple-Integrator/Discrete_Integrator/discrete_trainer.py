@@ -23,7 +23,7 @@ if __name__ == '__main__':
 
     # model.save("./model/dqn_simp_integrator_with_SOC_penalty_soc_range_point65_point85_uniform_extended_2T19")
     # model.save("./model/NO_TRAINING_BASELINE_T10")    REPEAT_1T1
-    model.save("./model/REPEAT_1T3_5")
+    # model.save("./model/REPEAT_1T3_5")
 
     # model = DQN.load("./log_files/models/dqn_simp_integrator_with_SOC_penalty_soc_range_point55_point85_uniform_extended")
 

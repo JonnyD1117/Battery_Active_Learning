@@ -13,23 +13,11 @@ if __name__ == '__main__':
 
     model = DQN(MlpPolicy, env, verbose=1, exploration_final_eps=.2)
     # model = DQN.load("./model/dqn_simp_integrator_with_SOC_penalty_no_soc_range_5_uniform_extended")
+    model.learn(total_timesteps=5000000)
 
-    # model.load("./model/dqn_simp_integrator_with_SOC_penalty_soc_range_point65_point85_uniform_extended_T19")
+    model.save("./model/Training_Time_Test_1_1_5")
 
-    # model.learn(total_timesteps=2500000)
-    # model.learn(total_timesteps=1000000)
-    model.learn(total_timesteps=500000)
-    # model.learn(total_timesteps=20000)
-
-    # model.learn(total_timesteps=100000)
-
-    # model.save("./model/dqn_simp_integrator_with_SOC_penalty_soc_range_point65_point85_uniform_extended_2T19")
-    # model.save("./model/NO_TRAINING_BASELINE_T10")    REPEAT_1T1
-    model.save("./model/REPEAT_w_time_remaining_1T1_1")
-
-    # model = DQN.load("./log_files/models/dqn_simp_integrator_with_SOC_penalty_soc_range_point55_point85_uniform_extended")
-
-    action_value = {0:-25.67, 1:0, 2: 25.67}
+    action_value = {0: -25.67, 1: 0, 2: 25.67}
 
     soc_list = []
     remaining_time_list = []

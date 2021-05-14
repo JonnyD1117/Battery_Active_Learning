@@ -1,11 +1,13 @@
 import scipy.io
-from SPMe_w_Sensitivity_Params import SingleParticleModelElectrolyte_w_Sensitivity
+# from SPMe_w_Sensitivity_Params import SingleParticleModelElectrolyte_w_Sensitivity
 from torch.utils.tensorboard import SummaryWriter
 import matplotlib.pyplot as plt
 
 
 mat = scipy.io.loadmat("I_FUDS.mat")
 mat2 = scipy.io.loadmat("Test_Data_mfiles/correct_pulse_input.mat")
+
+print(mat)
 
 I_fuds = mat["I"][0][:]
 time_fuds = mat['time'][0][:]
