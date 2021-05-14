@@ -34,7 +34,7 @@ class DiscreteSimpleSOC(gym.Env):
         self.log_state = log_state
 
         if self.log_state is True:
-            self.writer = SummaryWriter('./log_files/Training_Time_Test_1_1_5')
+            self.writer = SummaryWriter('5_million_Training/log_files/Training_Time_Test_1_1_5')
 
         state_limits = np.array([np.inf, np.inf], dtype=np.float32)
         action_limits = np.array([25.67*self.c_rate], dtype=np.float32)
