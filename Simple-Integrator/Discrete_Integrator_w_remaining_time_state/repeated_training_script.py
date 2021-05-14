@@ -34,7 +34,7 @@ class DiscreteSimpleSOC(gym.Env):
         self.cumulative_reward = 0
 
         if self.log_state is True:
-            self.writer = SummaryWriter(f'./Repeated_Training_Remaining_Time_5Million_Simple_Integrator/log_files/Training_Time_Test_{trial_num}')
+            self.writer = SummaryWriter(f'./Repeated_Training_Remaining_Time_6p5Million_Simple_Integrator/log_files/Training_Time_Test_{trial_num}')
             # self.writer = SummaryWriter('./log_files/tb_log/Round1/Disc_NO_TRAINING_10')
 
         state_limits = np.array([np.inf, np.inf], dtype=np.float32)
@@ -172,26 +172,24 @@ def increment_mean(new_value, prev_mean, mean_counter):
 
 if __name__ == '__main__':
 
-    # save_list = ["1_1_1", "1_1_2", "1_1_3", "1_1_4", "1_1_5", "1_1_6", "1_1_7", "1_1_8", "1_1_9", "1_1_10",
-    #              "1_2_1", "1_2_2", "1_2_3", "1_2_4", "1_2_5", "1_2_6", "1_2_7", "1_2_8", "1_2_9", "1_2_10",
-    #              "1_3_1", "1_3_2", "1_3_3", "1_3_4", "1_3_5", "1_3_6", "1_3_7", "1_3_8", "1_3_9", "1_3_10",
-    #              "1_4_1", "1_4_2", "1_4_3", "1_4_4", "1_4_5", "1_4_6", "1_4_7", "1_4_8", "1_4_9", "1_4_10",
-    #              "1_5_1", "1_5_2", "1_5_3", "1_5_4", "1_5_5", "1_5_6", "1_5_7", "1_5_7", "1_5_9", "1_5_10"]
-
-    save_list = ["1_1_1"]
+    save_list = ["1_1_1", "1_1_2", "1_1_3",
+                 "1_2_1", "1_2_2", "1_2_3",
+                 "1_3_1", "1_3_2", "1_3_3", "1_3_4",
+                 "1_4_1", "1_4_2", "1_4_3", "1_4_4",
+                 "1_5_1", "1_5_2", "1_5_3", "1_5_4", "1_5_5"]
 
     for ind, trial_num in enumerate(save_list):
 
-        if ind <= 9:
+        if ind <= 2:
             thres = .55
 
-        elif 9 < ind <= 19:
+        elif 2 < ind <= 5:
             thres = .6
 
-        elif 19 < ind <= 29:
+        elif 5 < ind <= 9:
             thres = .65
 
-        elif 29 < ind <= 39:
+        elif 9 < ind <= 13:
             thres = .7
 
         else:
@@ -199,9 +197,9 @@ if __name__ == '__main__':
 
         env = DiscreteSimpleSOC(threshold_value=thres, trial_num=trial_num)
         model = DQN(MlpPolicy, env, verbose=1)
-        model.learn(total_timesteps=8)
+        model.learn(total_timesteps=6500000)
 
-        model.save(f"./Repeated_Training_Remaining_Time_5Million_Simple_Integrator/model/Training_Time_Test_{trial_num}")
+        model.save(f"./Repeated_Training_Remaining_Time_6p5Million_Simple_Integrator/model/Training_Time_Test_{trial_num}")
 
         action_value = {0: -25.67, 1: 0, 2: 25.67}
 
@@ -240,19 +238,19 @@ if __name__ == '__main__':
                 plt.figure()
                 plt.plot(soc_list)
                 plt.title(f"State of Charge: Trial Number: {trial_num} Stoichastic: {stoich_val}")
-                plt.savefig(f"./Repeated_Training_Remaining_Time_5Million_Simple_Integrator/model/images/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_SOC.png")
-                np.save(f"./Repeated_Training_Remaining_Time_5Million_Simple_Integrator/model/outputs/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_SOC", soc_list)
+                plt.savefig(f"./Repeated_Training_Remaining_Time_6p5Million_Simple_Integrator/model/images/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_SOC.png")
+                np.save(f"./Repeated_Training_Remaining_Time_6p5Million_Simple_Integrator/model/outputs/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_SOC", soc_list)
 
                 plt.figure()
                 plt.plot(remaining_time_list)
                 plt.title(f"Remaining Time: Trial Number: {trial_num} Stoichastic: {stoich_val}")
-                plt.savefig(f"./Repeated_Training_Remaining_Time_5Million_Simple_Integrator/model/images/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_remaining_time.png")
-                np.save(f"./Repeated_Training_Remaining_Time_5Million_Simple_Integrator/model/outputs/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_SOC", remaining_time_list)
+                plt.savefig(f"./Repeated_Training_Remaining_Time_6p5Million_Simple_Integrator/model/images/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_remaining_time.png")
+                np.save(f"./Repeated_Training_Remaining_Time_6p5Million_Simple_Integrator/model/outputs/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_SOC", remaining_time_list)
 
                 plt.figure()
                 plt.plot(action_list)
                 plt.title(f"Input Currents: Trial Number: {trial_num} Stoichastic: {stoich_val}")
-                plt.savefig(f"./Repeated_Training_Remaining_Time_5Million_Simple_Integrator/model/images/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_input_current.png")
-                np.save(f"./Repeated_Training_Remaining_Time_5Million_Simple_Integrator/model/outputs/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_SOC", action_list)
+                plt.savefig(f"./Repeated_Training_Remaining_Time_6p5Million_Simple_Integrator/model/images/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_input_current.png")
+                np.save(f"./Repeated_Training_Remaining_Time_6p5Million_Simple_Integrator/model/outputs/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_SOC", action_list)
         except ValueError:
             print("Action produced 2 Actions ERROR (skipping model evluation")
