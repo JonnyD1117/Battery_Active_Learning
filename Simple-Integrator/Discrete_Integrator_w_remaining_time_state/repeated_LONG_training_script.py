@@ -34,7 +34,7 @@ class DiscreteSimpleSOC(gym.Env):
         self.cumulative_reward = 0
 
         if self.log_state is True:
-            self.writer = SummaryWriter(f'./20_Million_Training/log_files/Training_Time_Test_{trial_num}')
+            self.writer = SummaryWriter(f'./30_Million_Training/log_files/Training_Time_Test_{trial_num}')
             # self.writer = SummaryWriter('./log_files/tb_log/Round1/Disc_NO_TRAINING_10')
 
         state_limits = np.array([np.inf, np.inf], dtype=np.float32)
@@ -172,18 +172,16 @@ def increment_mean(new_value, prev_mean, mean_counter):
 
 if __name__ == '__main__':
 
-    save_list = ["3_1_1", "3_1_2", "3_1_3",
-                 "3_2_1", "3_2_2", "3_2_3"]
+    save_list = ["3_2_1", "3_2_2", "3_2_3"]
 
 
-    training_length_dict = {"3_1_1" : 20000000, "3_1_2" : 20000000, "3_1_3": 20000000,
-                            "3_2_1" : 30000000, "3_2_2" : 30000000, "3_2_3" : 30000000}
+    training_length_dict = {"3_2_1" : 30000000, "3_2_2" : 30000000, "3_2_3" : 30000000}
 
     for ind, trial_num in enumerate(save_list):
 
         train_len = training_length_dict[trial_num]
 
-        if ind ==0 or ind ==3:
+        if ind == 0 or ind == 3:
             thres = .55
 
         # elif 1 < ind <= 3:
@@ -202,7 +200,9 @@ if __name__ == '__main__':
         model = DQN(MlpPolicy, env, verbose=1)
         model.learn(total_timesteps=train_len)
 
-        model.save(f"./20_Million_Training/model/Training_Time_Test_{trial_num}")
+        model.save(f"./30_Million_Training/model/Training_Time_Test_{trial_num}")
+
+        model.load()
 
         action_value = {0: -25.67, 1: 0, 2: 25.67}
 
@@ -241,19 +241,19 @@ if __name__ == '__main__':
                 plt.figure()
                 plt.plot(soc_list)
                 plt.title(f"State of Charge: Trial Number: {trial_num} Stoichastic: {stoich_val}")
-                plt.savefig(f"./20_Million_Training/model/images/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_SOC.png")
-                np.save(f"./20_Million_Training/model/outputs/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_SOC", soc_list)
+                plt.savefig(f"./30_Million_Training/model/images/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_SOC.png")
+                np.save(f"./30_Million_Training/model/outputs/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_SOC", soc_list)
 
                 plt.figure()
                 plt.plot(remaining_time_list)
                 plt.title(f"Remaining Time: Trial Number: {trial_num} Stoichastic: {stoich_val}")
-                plt.savefig(f"./20_Million_Training/model/images/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_remaining_time.png")
-                np.save(f"./20_Million_Training/model/outputs/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_SOC", remaining_time_list)
+                plt.savefig(f"./30_Million_Training/model/images/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_remaining_time.png")
+                np.save(f"./30_Million_Training/model/outputs/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_SOC", remaining_time_list)
 
                 plt.figure()
                 plt.plot(action_list)
                 plt.title(f"Input Currents: Trial Number: {trial_num} Stoichastic: {stoich_val}")
-                plt.savefig(f"./20_Million_Training/model/images/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_input_current.png")
-                np.save(f"./20_Million_Training/model/outputs/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_SOC", action_list)
+                plt.savefig(f"./30_Million_Training/model/images/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_input_current.png")
+                np.save(f"./30_Million_Training/model/outputs/REPEAT_w_time_remaining_1T{trial_num}_stoich_{stoich_val}_SOC", action_list)
         except ValueError:
             print("Action produced 2 Actions ERROR (skipping model evluation")
